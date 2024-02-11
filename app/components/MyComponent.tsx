@@ -1,21 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function MyComponent() {
-  let jsonResponse;
+  const [jsonResponse, setJsonResponse] = useState('');
 
   useEffect(() => {
-    fetch('/api/jeff-website-api-0.0.1-SNAPSHOT/helloworld')
+    fetch('/api/helloworld')
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        jsonResponse = data;
+        setJsonResponse(data.message);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
       });
-  });
+  }), [];
 
   return (
     <div>
