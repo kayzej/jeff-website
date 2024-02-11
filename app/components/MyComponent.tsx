@@ -6,7 +6,7 @@ export default function MyComponent() {
   let jsonResponse;
 
   useEffect(() => {
-    fetch('jeff-website-api-0.0.1-SNAPSHOT/helloworld')
+    fetch('/api/jeff-website-api-0.0.1-SNAPSHOT/helloworld')
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
