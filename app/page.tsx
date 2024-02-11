@@ -1,10 +1,10 @@
 export default function Home() {
-  fetch("jeff-website-api-0.0.1-SNAPSHOT/helloworld")
-    .then(response => response.json())
-    .then(data => {
+  fetch('jeff-website-api-0.0.1-SNAPSHOT/helloworld')
+    .then((response) => response.json())
+    .then((data) => {
       console.log(data);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Error fetching data:', error);
     });
 
