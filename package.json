@@ -11,6 +11,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "http-proxy-middleware": "^2.0.6",
     "next": "^14.1.0",
     "node": ">=18.17.0",
     "react": "^18",
