@@ -11,11 +11,18 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@emotion/cache": "latest",
+    "@emotion/react": "latest",
+    "@emotion/styled": "latest",
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "latest",
+    "@mui/material": "latest",
+    "@mui/material-nextjs": "^5.15.9",
     "http-proxy-middleware": "^2.0.6",
     "next": "^14.1.0",
     "node": ">=18.17.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
     "yarn": "^1.22.21"
   },
   "devDependencies": {
@@ -37,5 +44,9 @@
     "prettier": "3.2.5",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
   }
 }
