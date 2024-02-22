@@ -1,9 +1,7 @@
-import { Box, TextField } from "@mui/material";
-import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import MyComponent from "../components/MyComponent";
 import { BASE_URL } from "../constants/constants";
-import MinHeightTextarea from "@/components/MinHeightTextarea";
-import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
+import Button from 'react-bootstrap/Button';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 async function getData() {
   const res = await fetch(`${BASE_URL}/helloworld`);
@@ -25,28 +23,7 @@ export default async function Home() {
         <p>Enter your name and a message and I will save it to my database!</p>
         <MyComponent></MyComponent>
         {data?.message ? <p>Server Fetch: {data.message}</p> : <p>No data</p>}
-        <Box className="my-6">
-          <TextField placeholder="First Name"></TextField>
-          <TextField placeholder="Last Name"></TextField>
-        </Box>
-        <Box>
-          <TextField
-            id="outlined-multiline-flexible"
-            label="Multiline"
-            multiline
-            maxRows={4}
-            minRows={4}
-          />
-        </Box>
-        <Box>
-          <TextareaAutosize
-            id="outlined-multiline-flexible"
-            minRows={4}
-            placeholder="message"
-          />
-        </Box>
-        <MinHeightTextarea></MinHeightTextarea>
-        <BaseTextareaAutosize aria-label="minimum height" minRows={3} placeholder="Minimum 3 rows" />
+        <Button>I am a button</Button>
       </div>
     </main >
   );
