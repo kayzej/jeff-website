@@ -16,9 +16,5 @@ export default function MyComponent() {
       });
   }, []);
 
-  return (
-    <div>
-      {jsonResponse ? <p>Client Fetch: {jsonResponse}</p> : <p>Loading</p>}
-    </div>
-  );
+  return <div>{jsonResponse ? <p>Client Fetch: {jsonResponse}</p> : <p>Loading</p>}</div>;
 }
