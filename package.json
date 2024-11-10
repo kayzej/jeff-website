@@ -10,9 +10,14 @@
     "lint:fix": "npx eslint --fix ."
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
     "bootstrap": "^5.3.3",
-    "next": "14.1.0",
+    "jeff-website": "file:",
+    "next": "^15.0.3",
     "node": ">=18.17.0",
     "react": "^17.0.0 || ^18.0.0",
     "react-bootstrap": "^2.10.1",

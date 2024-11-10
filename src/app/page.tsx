@@ -3,6 +3,7 @@
 // import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MyForm from '@/components/MyForm';
+import Navbar from '@/components/NavBar';
 
 // async function getData() {
 //   const res = await fetch(`${BASE_URL}/helloworld`);
@@ -18,7 +19,8 @@ import MyForm from '@/components/MyForm';
 export default async function Home() {
   // const data = await getData();
   return (
-    <main className="flex min-h-screen items-center justify-between p-24">
+    // <main className="flex min-h-screen items-center justify-between p-24">
+    <main className="">
       <div>
         <h1 className="font-extrabold">Welcome to Jeff{'\u0027'}s Website!</h1>
         <p>Enter your name and a message and I will save it to my database!</p>
