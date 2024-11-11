@@ -7,8 +7,6 @@ export default function About() {
     <main className="">
       <div>
         <h1 className="font-extrabold">Test</h1>
-        <p>This is the test page.</p>
-        <VerticalNavBar />
       </div>
     </main>
   );

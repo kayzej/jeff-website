@@ -1,23 +1,20 @@
+"use client";
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 
 const Navbar = () => {
+  const handleResumeDownload = (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    const link = document.createElement('a');
+    link.href = '/Jeff_Kayzerman_Resume.pdf';
+    link.download = 'Jeff_Kayzerman_Resume.pdf';
+    link.click();
+  };
+
   return (
     <AppBar position="static">
-      <Toolbar>
-        <IconButton
-          size="large"
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          sx={{ mr: 2 }}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          My Website
-        </Typography>
+      <Toolbar sx={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>
+        {/* <VerticalNavBar /> */}
         <Box>
           <Button color="inherit" href="/">
             Home
@@ -25,12 +22,15 @@ const Navbar = () => {
           <Button color="inherit" href="/about">
             About
           </Button>
+          <Button color="inherit" onClick={handleResumeDownload}>
+            Resume
+          </Button>
           <Button color="inherit" href="/test">
             Test
           </Button>
-        </Box>
-      </Toolbar>
-    </AppBar>
+        </Box >
+      </Toolbar >
+    </AppBar >
   );
 };
 

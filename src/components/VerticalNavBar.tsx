@@ -53,7 +53,6 @@ export default function TemporaryDrawer() {
 
   return (
     <div>
-      {/* <Button onClick={toggleDrawer(true)}>Open drawer</Button> */}
       <IconButton
         size="large"
         edge="start"
