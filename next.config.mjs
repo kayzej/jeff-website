@@ -4,9 +4,9 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/backend/:path*',
+        source: '/api/:path*',
         destination:
-          'https://jeffreykayzerman.com/api/:path*', // Proxy to Backend
+          'https://jeffreykayzerman.com/api/:path*', // Proxy to api
       },
     ];
   },

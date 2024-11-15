@@ -23,7 +23,7 @@ export default function MyComponent() {
           {/* You can add additional content here */}
         </div>
       ) : (
-        <Form onSubmit={handleSubmit} action="/backend/formSubmit">
+        <Form onSubmit={handleSubmit} action="/api/formSubmit">
           <Form.Group className="mb-3" controlId="formName">
             <Row>
               <Col>

@@ -12,8 +12,8 @@ const Navbar = () => {
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar sx={{ backgroundColor: 'gray', color: 'white', fontWeight: 'bold' }}>
+    <AppBar position="static" sx={{ backgroundColor: 'transparent', color: 'black', fontWeight: 'bold' }} elevation={0}>
+      <Toolbar sx={{ color: 'black', fontWeight: 'bold' }}>
         {/* <VerticalNavBar /> */}
         <Box>
           <Button color="inherit" href="/">

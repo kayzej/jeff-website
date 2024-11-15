@@ -5,7 +5,7 @@ export default function MyComponent() {
   const [jsonResponse, setJsonResponse] = useState('');
 
   useEffect(() => {
-    fetch('/backend/helloworld')
+    fetch('/api/helloworld')
       .then((response) => response.json())
       .then((data) => {
         setJsonResponse(data.message);
