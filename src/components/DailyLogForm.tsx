@@ -59,15 +59,30 @@ const defaultDaily = (date: string): DailyData => ({
   sleepHours: 8,
   cardio: 0,
   strength: 0,
-  wife: 5, kids: 5, family: 5, friends: 5, neighbors: 5, coWorkers: 5,
+  wife: 5,
+  kids: 5,
+  family: 5,
+  friends: 5,
+  neighbors: 5,
+  coWorkers: 5,
   thoughtsFeelingsReflections: '',
 });
 
 const defaultPeriod = (): PeriodData => ({
-  mood: 5, energyLevel: 5, motivation: 5, productivity: 5,
-  anxiety: 0, depression: 0, moodSwings: 0, racingThoughts: 0,
+  mood: 5,
+  energyLevel: 5,
+  motivation: 5,
+  productivity: 5,
+  anxiety: 0,
+  depression: 0,
+  moodSwings: 0,
+  racingThoughts: 0,
   triggersOrMajorStressors: 0,
-  tremors: 0, dizziness: 0, headaches: 0, heartPalpitations: 0, nightSweats: 0,
+  tremors: 0,
+  dizziness: 0,
+  headaches: 0,
+  heartPalpitations: 0,
+  nightSweats: 0,
 });
 
 const defaultMeds = (): MedEntry[] => [
@@ -78,17 +93,24 @@ const defaultMeds = (): MedEntry[] => [
 ];
 
 const blankPeriods = () => ({
-  morning: defaultPeriod(), afternoon: defaultPeriod(),
-  evening: defaultPeriod(), night: defaultPeriod(),
+  morning: defaultPeriod(),
+  afternoon: defaultPeriod(),
+  evening: defaultPeriod(),
+  night: defaultPeriod(),
 });
 
 const blankMeds = () => ({
-  morning: defaultMeds(), afternoon: defaultMeds(),
-  evening: defaultMeds(), night: defaultMeds(),
+  morning: defaultMeds(),
+  afternoon: defaultMeds(),
+  evening: defaultMeds(),
+  night: defaultMeds(),
 });
 
 const blankLoaded = () => ({
-  morning: false, afternoon: false, evening: false, night: false,
+  morning: false,
+  afternoon: false,
+  evening: false,
+  night: false,
 });
 
 const PERIODS: Period[] = ['morning', 'afternoon', 'evening', 'night'];
@@ -104,26 +126,50 @@ const MED_LABELS: Record<MedName, string> = {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function Slider({
-  label, min = 0, max = 10, value, onChange, accent = '#d4a853',
+  label,
+  min = 0,
+  max = 10,
+  value,
+  onChange,
+  accent = '#d4a853',
 }: {
-  label: string; min?: number; max?: number;
-  value: number; onChange: (v: number) => void; accent?: string;
+  label: string;
+  min?: number;
+  max?: number;
+  value: number;
+  onChange: (v: number) => void;
+  accent?: string;
 }) {
   return (
     <div className="slider-row">
       <div className="slider-header">
         <span className="slider-label">{label}</span>
-        <span className="slider-value" style={{ color: accent }}>{value}</span>
+        <span className="slider-value" style={{ color: accent }}>
+          {value}
+        </span>
       </div>
-      <input type="range" min={min} max={max} value={value}
-        onChange={e => onChange(Number(e.target.value))}
-        style={{ '--accent': accent } as React.CSSProperties} />
+      <input
+        type="range"
+        min={min}
+        max={max}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        style={{ '--accent': accent } as React.CSSProperties}
+      />
     </div>
   );
 }
 
-function SubmitBar({ status, label, onSubmit, errorMsg }: {
-  status: SectionStatus; label: string; onSubmit: () => void; errorMsg: string;
+function SubmitBar({
+  status,
+  label,
+  onSubmit,
+  errorMsg,
+}: {
+  status: SectionStatus;
+  label: string;
+  onSubmit: () => void;
+  errorMsg: string;
 }) {
   return (
     <div className="submit-bar">
@@ -136,9 +182,7 @@ function SubmitBar({ status, label, onSubmit, errorMsg }: {
   );
 }
 
-function SectionCard({ title, loaded, children }: {
-  title: string; loaded: boolean; children: React.ReactNode;
-}) {
+function SectionCard({ title, loaded, children }: { title: string; loaded: boolean; children: React.ReactNode }) {
   return (
     <div className="section-card">
       <div className="section-card-header">
@@ -199,7 +243,7 @@ export default function DailyLogForm() {
         const { records } = await pr.json();
         const updated = blankPeriods();
         const loaded = blankLoaded();
-        for (const r of (records ?? [])) {
+        for (const r of records ?? []) {
           updated[r.period as Period] = r;
           loaded[r.period as Period] = true;
         }
@@ -213,9 +257,9 @@ export default function DailyLogForm() {
         const { records } = await mr.json();
         const updated = blankMeds();
         const loaded = blankLoaded();
-        for (const r of (records ?? [])) {
+        for (const r of records ?? []) {
           const p = r.period as Period;
-          const idx = updated[p].findIndex(m => m.medication === r.medication);
+          const idx = updated[p].findIndex((m) => m.medication === r.medication);
           if (idx >= 0) updated[p][idx] = { medication: r.medication, doseMg: r.dose_mg, taken: r.taken };
           loaded[p] = true;
         }
@@ -229,12 +273,15 @@ export default function DailyLogForm() {
     }
   }, []);
 
-  useEffect(() => { fetchDate(date); }, [date, fetchDate]);
+  useEffect(() => {
+    fetchDate(date);
+  }, [date, fetchDate]);
 
   // ── Submit handlers ────────────────────────────────────────────────────────
 
   const submitDaily = async () => {
-    setDailyStatus('loading'); setDailyErr('');
+    setDailyStatus('loading');
+    setDailyErr('');
     try {
       const res = await fetch('/api/daily', {
         method: 'POST',
@@ -252,7 +299,8 @@ export default function DailyLogForm() {
   };
 
   const submitPeriod = async () => {
-    setPeriodStatus('loading'); setPeriodErr('');
+    setPeriodStatus('loading');
+    setPeriodErr('');
     try {
       const now = new Date();
       const timestamp = `${date}T${now.toTimeString().slice(0, 8)}`;
@@ -263,7 +311,7 @@ export default function DailyLogForm() {
       });
       if (!res.ok) throw new Error((await res.json()).message);
       setPeriodStatus('success');
-      setPeriodLoaded(p => ({ ...p, [period]: true }));
+      setPeriodLoaded((p) => ({ ...p, [period]: true }));
       setTimeout(() => setPeriodStatus('idle'), 3000);
     } catch (e) {
       setPeriodStatus('error');
@@ -272,7 +320,8 @@ export default function DailyLogForm() {
   };
 
   const submitMeds = async () => {
-    setMedsStatus('loading'); setMedsErr('');
+    setMedsStatus('loading');
+    setMedsErr('');
     try {
       const res = await fetch('/api/medications', {
         method: 'POST',
@@ -281,7 +330,7 @@ export default function DailyLogForm() {
       });
       if (!res.ok) throw new Error((await res.json()).message);
       setMedsStatus('success');
-      setMedsLoaded(p => ({ ...p, [medPeriod]: true }));
+      setMedsLoaded((p) => ({ ...p, [medPeriod]: true }));
       setTimeout(() => setMedsStatus('idle'), 3000);
     } catch (e) {
       setMedsStatus('error');
@@ -291,17 +340,15 @@ export default function DailyLogForm() {
 
   // ── Field helpers ──────────────────────────────────────────────────────────
 
-  const setDailyField = <K extends keyof DailyData>(k: K, v: DailyData[K]) =>
-    setDaily(d => ({ ...d, [k]: v }));
+  const setDailyField = <K extends keyof DailyData>(k: K, v: DailyData[K]) => setDaily((d) => ({ ...d, [k]: v }));
 
   const setPeriodField = <K extends keyof PeriodData>(k: K, v: PeriodData[K]) =>
-    setPeriodData(d => ({ ...d, [period]: { ...d[period], [k]: v } }));
+    setPeriodData((d) => ({ ...d, [period]: { ...d[period], [k]: v } }));
 
   const updateMed = (p: Period, idx: number, field: keyof MedEntry, value: number | boolean) =>
-    setMeds(m => ({ ...m, [p]: m[p].map((e, i) => i === idx ? { ...e, [field]: value } : e) }));
+    setMeds((m) => ({ ...m, [p]: m[p].map((e, i) => (i === idx ? { ...e, [field]: value } : e)) }));
 
-  const niceName = (k: string) =>
-    k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+  const niceName = (k: string) => k.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
 
   const cur = periodData[period];
   const curMeds = meds[medPeriod];
@@ -509,8 +556,7 @@ export default function DailyLogForm() {
         {/* ── Date picker ── */}
         <div className="date-row">
           <span className="date-label">Date</span>
-          <input type="date" className="date-input" value={date}
-            onChange={e => setDate(e.target.value)} />
+          <input type="date" className="date-input" value={date} onChange={(e) => setDate(e.target.value)} />
           {fetching && <span className="fetching-indicator">Loading…</span>}
         </div>
 
@@ -518,98 +564,140 @@ export default function DailyLogForm() {
         <SectionCard title="Daily" loaded={dailyLoaded}>
           <p className="sub-label">Timestamps</p>
           <div className="time-grid">
-            {([
-              ['timeOfWakingUp', 'Waking Up'],
-              ['firstSocialInteraction', 'First Social Interaction'],
-              ['firstActivityOrWorkStart', 'Work / Activity Start'],
-              ['timeOfGoingToBed', 'Going to Bed'],
-            ] as [keyof DailyData, string][]).map(([k, label]) => (
+            {(
+              [
+                ['timeOfWakingUp', 'Waking Up'],
+                ['firstSocialInteraction', 'First Social Interaction'],
+                ['firstActivityOrWorkStart', 'Work / Activity Start'],
+                ['timeOfGoingToBed', 'Going to Bed'],
+              ] as [keyof DailyData, string][]
+            ).map(([k, label]) => (
               <div className="time-field" key={k}>
                 <label>{label}</label>
-                <input type="datetime-local" value={daily[k] as string}
-                  onChange={e => setDailyField(k, e.target.value)} />
+                <input
+                  type="datetime-local"
+                  value={daily[k] as string}
+                  onChange={(e) => setDailyField(k, e.target.value)}
+                />
               </div>
             ))}
           </div>
 
           <hr className="divider" />
           <p className="sub-label">Sleep &amp; Exercise</p>
-          <Slider label="Sleep Hours" min={0} max={14} value={daily.sleepHours}
-            onChange={v => setDailyField('sleepHours', v)} accent="#3d6a8a" />
-          <Slider label="Cardio (min)" min={0} max={120} value={daily.cardio}
-            onChange={v => setDailyField('cardio', v)} accent="#3d6a8a" />
-          <Slider label="Strength (min)" min={0} max={120} value={daily.strength}
-            onChange={v => setDailyField('strength', v)} accent="#3d6a8a" />
+          <Slider
+            label="Sleep Hours"
+            min={0}
+            max={14}
+            value={daily.sleepHours}
+            onChange={(v) => setDailyField('sleepHours', v)}
+            accent="#3d6a8a"
+          />
+          <Slider
+            label="Cardio (min)"
+            min={0}
+            max={120}
+            value={daily.cardio}
+            onChange={(v) => setDailyField('cardio', v)}
+            accent="#3d6a8a"
+          />
+          <Slider
+            label="Strength (min)"
+            min={0}
+            max={120}
+            value={daily.strength}
+            onChange={(v) => setDailyField('strength', v)}
+            accent="#3d6a8a"
+          />
 
           <hr className="divider" />
           <p className="sub-label">Social Quality (0–10)</p>
-          {(['wife', 'kids', 'family', 'friends', 'neighbors', 'coWorkers'] as (keyof DailyData)[]).map(k => (
-            <Slider key={k} label={niceName(k)} value={daily[k] as number}
-              onChange={v => setDailyField(k, v)} accent="#d4a853" />
+          {(['wife', 'kids', 'family', 'friends', 'neighbors', 'coWorkers'] as (keyof DailyData)[]).map((k) => (
+            <Slider
+              key={k}
+              label={niceName(k)}
+              value={daily[k] as number}
+              onChange={(v) => setDailyField(k, v)}
+              accent="#d4a853"
+            />
           ))}
 
           <hr className="divider" />
           <p className="sub-label">Reflections</p>
-          <textarea className="reflections-area"
+          <textarea
+            className="reflections-area"
             value={daily.thoughtsFeelingsReflections}
-            onChange={e => setDailyField('thoughtsFeelingsReflections', e.target.value)}
-            placeholder="Write freely…" />
+            onChange={(e) => setDailyField('thoughtsFeelingsReflections', e.target.value)}
+            placeholder="Write freely…"
+          />
 
-          <SubmitBar status={dailyStatus} label="Save Daily Entry"
-            onSubmit={submitDaily} errorMsg={dailyErr} />
+          <SubmitBar status={dailyStatus} label="Save Daily Entry" onSubmit={submitDaily} errorMsg={dailyErr} />
         </SectionCard>
 
         {/* ══ SECTION 2: Period Log ═════════════════════════════════════════ */}
         <SectionCard title="Period Log" loaded={periodLoaded[period]}>
           <div className="period-tabs">
-            {PERIODS.map(p => (
-              <button key={p} className={`period-tab ${period === p ? 'active' : ''}`}
-                onClick={() => setPeriod(p)}>
-                {p}{periodLoaded[p] && <span className="dot" />}
+            {PERIODS.map((p) => (
+              <button key={p} className={`period-tab ${period === p ? 'active' : ''}`} onClick={() => setPeriod(p)}>
+                {p}
+                {periodLoaded[p] && <span className="dot" />}
               </button>
             ))}
           </div>
 
           <p className="sub-label">Mood &amp; Mental State</p>
-          {([
-            ['mood', '#d4a853'],
-            ['energyLevel', '#d4a853'],
-            ['motivation', '#d4a853'],
-            ['productivity', '#d4a853'],
-            ['anxiety', '#c4552a'],
-            ['depression', '#c4552a'],
-            ['moodSwings', '#c4552a'],
-            ['racingThoughts', '#c4552a'],
-            ['triggersOrMajorStressors', '#c4552a'],
-          ] as [keyof PeriodData, string][]).map(([k, accent]) => (
-            <Slider key={k} label={niceName(k)} value={cur[k]}
-              onChange={v => setPeriodField(k, v)} accent={accent} />
+          {(
+            [
+              ['mood', '#d4a853'],
+              ['energyLevel', '#d4a853'],
+              ['motivation', '#d4a853'],
+              ['productivity', '#d4a853'],
+              ['anxiety', '#c4552a'],
+              ['depression', '#c4552a'],
+              ['moodSwings', '#c4552a'],
+              ['racingThoughts', '#c4552a'],
+              ['triggersOrMajorStressors', '#c4552a'],
+            ] as [keyof PeriodData, string][]
+          ).map(([k, accent]) => (
+            <Slider key={k} label={niceName(k)} value={cur[k]} onChange={(v) => setPeriodField(k, v)} accent={accent} />
           ))}
 
           <hr className="divider" />
           <p className="sub-label">Physical Symptoms</p>
           <div className="symptom-grid">
-            {(['tremors', 'dizziness', 'headaches', 'heartPalpitations', 'nightSweats'] as (keyof PeriodData)[]).map(k => (
-              <div key={k} className={`symptom-toggle ${cur[k] ? 'active' : ''}`}
-                onClick={() => setPeriodField(k, cur[k] ? 0 : 1)}>
-                <div className="symptom-dot" />
-                <span className="symptom-name">{niceName(k)}</span>
-              </div>
-            ))}
+            {(['tremors', 'dizziness', 'headaches', 'heartPalpitations', 'nightSweats'] as (keyof PeriodData)[]).map(
+              (k) => (
+                <div
+                  key={k}
+                  className={`symptom-toggle ${cur[k] ? 'active' : ''}`}
+                  onClick={() => setPeriodField(k, cur[k] ? 0 : 1)}
+                >
+                  <div className="symptom-dot" />
+                  <span className="symptom-name">{niceName(k)}</span>
+                </div>
+              )
+            )}
           </div>
 
-          <SubmitBar status={periodStatus}
+          <SubmitBar
+            status={periodStatus}
             label={`Save ${niceName(period)} Entry`}
-            onSubmit={submitPeriod} errorMsg={periodErr} />
+            onSubmit={submitPeriod}
+            errorMsg={periodErr}
+          />
         </SectionCard>
 
         {/* ══ SECTION 3: Medications ════════════════════════════════════════ */}
         <SectionCard title="Medications" loaded={medsLoaded[medPeriod]}>
           <div className="period-tabs">
-            {PERIODS.map(p => (
-              <button key={p} className={`period-tab ${medPeriod === p ? 'active' : ''}`}
-                onClick={() => setMedPeriod(p)}>
-                {p}{medsLoaded[p] && <span className="dot" />}
+            {PERIODS.map((p) => (
+              <button
+                key={p}
+                className={`period-tab ${medPeriod === p ? 'active' : ''}`}
+                onClick={() => setMedPeriod(p)}
+              >
+                {p}
+                {medsLoaded[p] && <span className="dot" />}
               </button>
             ))}
           </div>
@@ -618,22 +706,31 @@ export default function DailyLogForm() {
             <div key={med.medication} className="med-row">
               <span className="med-name">{MED_LABELS[med.medication]}</span>
               <div className="med-dose-wrap">
-                <input type="number" className="med-dose-input" min={0} value={med.doseMg}
-                  onChange={e => updateMed(medPeriod, idx, 'doseMg', Number(e.target.value))} />
+                <input
+                  type="number"
+                  className="med-dose-input"
+                  min={0}
+                  value={med.doseMg}
+                  onChange={(e) => updateMed(medPeriod, idx, 'doseMg', Number(e.target.value))}
+                />
                 <span className="med-unit">mg</span>
               </div>
-              <div className={`med-taken ${med.taken ? 'taken' : ''}`}
-                onClick={() => updateMed(medPeriod, idx, 'taken', !med.taken)}>
+              <div
+                className={`med-taken ${med.taken ? 'taken' : ''}`}
+                onClick={() => updateMed(medPeriod, idx, 'taken', !med.taken)}
+              >
                 {med.taken ? '✓ taken' : 'not taken'}
               </div>
             </div>
           ))}
 
-          <SubmitBar status={medsStatus}
+          <SubmitBar
+            status={medsStatus}
             label={`Save ${niceName(medPeriod)} Medications`}
-            onSubmit={submitMeds} errorMsg={medsErr} />
+            onSubmit={submitMeds}
+            errorMsg={medsErr}
+          />
         </SectionCard>
-
       </div>
     </>
   );
