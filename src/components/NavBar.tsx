@@ -1,9 +1,9 @@
-"use client";
+'use client';
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Button, Box } from '@mui/material';
 
 const Navbar = () => {
-  const handleResumeDownload = (event: { preventDefault: () => void; }) => {
+  const handleResumeDownload = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     const link = document.createElement('a');
     link.href = '/Jeff_Kayzerman_Resume.pdf';
@@ -15,12 +15,11 @@ const Navbar = () => {
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Resume', onClick: handleResumeDownload }, // Use onClick for the Resume button
-    { label: 'Test', href: '/test' }
   ];
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'transparent', color: 'black', fontWeight: 'bold' }} elevation={0}>
-      <Toolbar sx={{ color: 'black', fontWeight: 'bold' }}>
+    <AppBar position="static" sx={{ backgroundColor: 'transparent', color: 'white', fontWeight: 'bold' }} elevation={0}>
+      <Toolbar sx={{ color: 'white', fontWeight: 'bold' }}>
         <Box>
           {buttons.map((button, index) => (
             <Button
@@ -34,8 +33,8 @@ const Navbar = () => {
             </Button>
           ))}
         </Box>
-      </Toolbar >
-    </AppBar >
+      </Toolbar>
+    </AppBar>
   );
 };
 

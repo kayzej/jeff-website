@@ -3,7 +3,18 @@ import pg from 'pg';
 import { DB_URL } from '@/constants/constants';
 
 const { Client } = pg;
-const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
+
+const getClientConfig = () => {
+  // Tiger Cloud requires SSL, so we force it on
+  return {
+    connectionString: process.env.DB_URL, // should already include ?sslmode=require or similar
+    ssl: {
+      rejectUnauthorized: false,   // ← this bypasses the self-signed cert check
+    },
+  };
+};
+
+const client = new Client(getClientConfig());
 
 export async function GET(req: NextRequest) {
   await client.connect();
@@ -36,6 +47,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  await client.connect();
   try {
     const {
       date,

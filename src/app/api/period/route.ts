@@ -3,9 +3,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import pg from 'pg';
 
 const { Client } = pg;
-const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
+
+const getClientConfig = () => {
+  // Tiger Cloud requires SSL, so we force it on
+  return {
+    connectionString: process.env.DB_URL, // should already include ?sslmode=require or similar
+    ssl: {
+      rejectUnauthorized: false,   // ← this bypasses the self-signed cert check
+    },
+  };
+};
+
+const client = new Client(getClientConfig());
 
 export async function GET(req: NextRequest) {
+  await client.connect();
   const date = req.nextUrl.searchParams.get('date');
   if (!date) return NextResponse.json({ message: 'date required' }, { status: 400 });
   try {
@@ -34,6 +46,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  await client.connect();
   try {
     const {
       timestamp, // TIMESTAMPTZ — e.g. "2026-02-27T09:00:00Z"
