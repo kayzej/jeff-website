@@ -1,27 +1,16 @@
-import { DB_URL } from '@/constants/constants';
 import { NextRequest, NextResponse } from 'next/server';
-import pg from 'pg';
+import { Pool } from 'pg';
 
-const { Client } = pg;
-
-const getClientConfig = () => {
-  // Tiger Cloud requires SSL, so we force it on
-  return {
-    connectionString: process.env.DB_URL, // should already include ?sslmode=require or similar
-    ssl: {
-      rejectUnauthorized: false,   // ← this bypasses the self-signed cert check
-    },
-  };
-};
-
-const client = new Client(getClientConfig());
+const pool = new Pool({
+  connectionString: process.env.TIMESCALE_DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
 export async function GET(req: NextRequest) {
-  await client.connect();
   const date = req.nextUrl.searchParams.get('date');
   if (!date) return NextResponse.json({ message: 'date required' }, { status: 400 });
   try {
-    const { rows } = await client.query(
+    const { rows } = await pool.query(
       `SELECT
         period,
         mood,
@@ -40,25 +29,32 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ records: rows });
   } catch (error) {
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
-  } finally {
-    await client.end();
   }
 }
 
 export async function POST(req: NextRequest) {
-  await client.connect();
   try {
     const {
-      timestamp, // TIMESTAMPTZ — e.g. "2026-02-27T09:00:00Z"
-      date,      // DATE        — e.g. "2026-02-27"
-      period,    // 'morning' | 'afternoon' | 'evening' | 'night'
-      mood, energyLevel, anxiety, depression,
-      moodSwings, racingThoughts, triggersOrMajorStressors,
-      motivation, productivity,
-      tremors, dizziness, headaches, heartPalpitations, nightSweats,
+      timestamp,
+      date,
+      period,
+      mood,
+      energyLevel,
+      anxiety,
+      depression,
+      moodSwings,
+      racingThoughts,
+      triggersOrMajorStressors,
+      motivation,
+      productivity,
+      tremors,
+      dizziness,
+      headaches,
+      heartPalpitations,
+      nightSweats,
     } = await req.json();
 
-    await client.query(
+    await pool.query(
       `INSERT INTO health.period_log (
         timestamp, date, period,
         mood, energy_level, anxiety, depression,
@@ -82,11 +78,23 @@ export async function POST(req: NextRequest) {
         heart_palpitations          = EXCLUDED.heart_palpitations,
         night_sweats                = EXCLUDED.night_sweats`,
       [
-        timestamp, date, period,
-        mood, energyLevel, anxiety, depression,
-        moodSwings, racingThoughts, triggersOrMajorStressors,
-        motivation, productivity,
-        tremors, dizziness, headaches, heartPalpitations, nightSweats,
+        timestamp,
+        date,
+        period,
+        mood,
+        energyLevel,
+        anxiety,
+        depression,
+        moodSwings,
+        racingThoughts,
+        triggersOrMajorStressors,
+        motivation,
+        productivity,
+        tremors,
+        dizziness,
+        headaches,
+        heartPalpitations,
+        nightSweats,
       ]
     );
 
@@ -94,7 +102,5 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[period_log]', error);
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
-  } finally {
-    await client.end();
   }
 }

@@ -1,30 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pg from 'pg';
-import { DB_URL } from '@/constants/constants';
+import { Pool } from 'pg';
 
-const { Client } = pg;
-
-const getClientConfig = () => {
-  // Tiger Cloud requires SSL, so we force it on
-  return {
-    connectionString: process.env.DB_URL, // should already include ?sslmode=require or similar
-    ssl: {
-      rejectUnauthorized: false,   // ← this bypasses the self-signed cert check
-    },
-  };
-};
-
-const client = new Client(getClientConfig());
+const pool = new Pool({
+  connectionString: process.env.TIMESCALE_DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
 export async function GET(req: NextRequest) {
-  await client.connect();
-  
   const date = req.nextUrl.searchParams.get('date');
-  
   if (!date) return NextResponse.json({ message: 'date required' }, { status: 400 });
-  
   try {
-    const { rows } = await client.query(
+    const { rows } = await pool.query(
       `SELECT period, medication, dose_mg, taken, notes
        FROM health.medication_log WHERE date = $1
        ORDER BY period, medication`,
@@ -34,15 +20,11 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
   }
-  finally {
-    await client.end();
-  }
 }
 
 // POST accepts an array of medication entries for a given date + period
 // Body: { date, period, medications: [{ medication, doseMg, taken, notes }] }
 export async function POST(req: NextRequest) {
-  await client.connect();
   try {
     const { date, period, medications } = await req.json();
 
@@ -50,11 +32,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'medications array is required' }, { status: 400 });
     }
 
+    const pgClient = await pool.connect();
     try {
-      await client.query('BEGIN');
+      await pgClient.query('BEGIN');
 
       for (const { medication, doseMg, taken = true, notes = null } of medications) {
-        await client.query(
+        await pgClient.query(
           `INSERT INTO health.medication_log (date, period, medication, dose_mg, taken, notes)
            VALUES ($1, $2, $3, $4, $5, $6)
            ON CONFLICT (date, period, medication) DO UPDATE SET
@@ -65,17 +48,17 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      await client.query('COMMIT');
+      await pgClient.query('COMMIT');
     } catch (err) {
-      await client.query('ROLLBACK');
+      await pgClient.query('ROLLBACK');
       throw err;
+    } finally {
+      pgClient.release();
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[medication_log]', error);
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
-  } finally {
-    await client.end();
   }
 }

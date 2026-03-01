@@ -1,28 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pg from 'pg';
-import { DB_URL } from '@/constants/constants';
+import { Pool } from 'pg';
 
-const { Client } = pg;
-
-const getClientConfig = () => {
-  // Tiger Cloud requires SSL, so we force it on
-  return {
-    connectionString: process.env.DB_URL, // should already include ?sslmode=require or similar
-    ssl: {
-      rejectUnauthorized: false,   // ← this bypasses the self-signed cert check
-    },
-  };
-};
-
-const client = new Client(getClientConfig());
+const pool = new Pool({
+  connectionString: process.env.TIMESCALE_DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
 export async function GET(req: NextRequest) {
-  await client.connect();
-
   const date = req.nextUrl.searchParams.get('date');
   if (!date) return NextResponse.json({ message: 'date required' }, { status: 400 });
   try {
-    const { rows } = await client.query(
+    const { rows } = await pool.query(
       `SELECT
         date,
         time_of_waking_up           AS "timeOfWakingUp",
@@ -41,13 +29,9 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
   }
-  finally {
-    await client.end();
-  }
 }
 
 export async function POST(req: NextRequest) {
-  await client.connect();
   try {
     const {
       date,
@@ -58,11 +42,16 @@ export async function POST(req: NextRequest) {
       sleepHours,
       cardio,
       strength,
-      wife, kids, family, friends, neighbors, coWorkers,
+      wife,
+      kids,
+      family,
+      friends,
+      neighbors,
+      coWorkers,
       thoughtsFeelingsReflections,
     } = await req.json();
 
-    await client.query(
+    await pool.query(
       `INSERT INTO health.daily_log (
         date, time_of_waking_up, first_social_interaction,
         first_activity_or_work_start, time_of_going_to_bed,
@@ -87,10 +76,20 @@ export async function POST(req: NextRequest) {
         thoughts_feelings_reflections = EXCLUDED.thoughts_feelings_reflections,
         updated_at                    = NOW()`,
       [
-        date, timeOfWakingUp, firstSocialInteraction,
-        firstActivityOrWorkStart, timeOfGoingToBed,
-        sleepHours, cardio, strength,
-        wife, kids, family, friends, neighbors, coWorkers,
+        date,
+        timeOfWakingUp,
+        firstSocialInteraction,
+        firstActivityOrWorkStart,
+        timeOfGoingToBed,
+        sleepHours,
+        cardio,
+        strength,
+        wife,
+        kids,
+        family,
+        friends,
+        neighbors,
+        coWorkers,
         thoughtsFeelingsReflections,
       ]
     );
@@ -99,7 +98,5 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[daily_log]', error);
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
-  } finally {
-    await client.end();
   }
 }
