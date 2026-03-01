@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import pg from 'pg';
+import { DB_URL } from '@/constants/constants';
 
-let pool: Pool | null = null;
-function getPool() {
-  if (!pool) pool = new Pool({ connectionString: process.env.TIMESCALE_DATABASE_URL, ssl: { rejectUnauthorized: true }, max: 5 });
-  return pool;
-}
+const { Client } = pg;
+const client = new Client({ connectionString: DB_URL });
 
 export async function GET(req: NextRequest) {
+  await client.connect();
+
   const date = req.nextUrl.searchParams.get('date');
   if (!date) return NextResponse.json({ message: 'date required' }, { status: 400 });
   try {
-    const { rows } = await getPool().query(
+    const { rows } = await client.query(
       `SELECT
         date,
         time_of_waking_up           AS "timeOfWakingUp",
@@ -30,6 +30,9 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
   }
+  finally {
+    await client.end();
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -47,7 +50,7 @@ export async function POST(req: NextRequest) {
       thoughtsFeelingsReflections,
     } = await req.json();
 
-    await getPool().query(
+    await client.query(
       `INSERT INTO health.daily_log (
         date, time_of_waking_up, first_social_interaction,
         first_activity_or_work_start, time_of_going_to_bed,
@@ -84,5 +87,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[daily_log]', error);
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
+  } finally {
+    await client.end();
   }
 }

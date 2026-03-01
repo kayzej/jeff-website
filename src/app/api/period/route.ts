@@ -1,17 +1,15 @@
+import { DB_URL } from '@/constants/constants';
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import pg from 'pg';
 
-let pool: Pool | null = null;
-function getPool() {
-  if (!pool) pool = new Pool({ connectionString: process.env.TIMESCALE_DATABASE_URL, ssl: { rejectUnauthorized: true }, max: 5 });
-  return pool;
-}
+const { Client } = pg;
+const client = new Client({ connectionString: DB_URL });
 
 export async function GET(req: NextRequest) {
   const date = req.nextUrl.searchParams.get('date');
   if (!date) return NextResponse.json({ message: 'date required' }, { status: 400 });
   try {
-    const { rows } = await getPool().query(
+    const { rows } = await client.query(
       `SELECT
         period,
         mood,
@@ -30,6 +28,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ records: rows });
   } catch (error) {
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
+  } finally {
+    await client.end();
   }
 }
 
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       tremors, dizziness, headaches, heartPalpitations, nightSweats,
     } = await req.json();
 
-    await getPool().query(
+    await client.query(
       `INSERT INTO health.period_log (
         timestamp, date, period,
         mood, energy_level, anxiety, depression,
@@ -81,5 +81,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('[period_log]', error);
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
+  } finally {
+    await client.end();
   }
 }
