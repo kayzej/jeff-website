@@ -3,7 +3,7 @@ import pg from 'pg';
 import { DB_URL } from '@/constants/constants';
 
 const { Client } = pg;
-const client = new Client({ connectionString: DB_URL });
+const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
 
 export async function GET(req: NextRequest) {
   await client.connect();

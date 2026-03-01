@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import pg from 'pg';
 
 const { Client } = pg;
-const client = new Client({ connectionString: DB_URL });
+const client = new Client({ connectionString: DB_URL, ssl: { rejectUnauthorized: false } });
 
 export async function GET(req: NextRequest) {
   const date = req.nextUrl.searchParams.get('date');
