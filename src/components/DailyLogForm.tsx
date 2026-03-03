@@ -15,13 +15,6 @@ interface DailyData {
   sleepHours: number;
   cardio: number;
   strength: number;
-  wife: number;
-  kids: number;
-  family: number;
-  friends: number;
-  neighbors: number;
-  coWorkers: number;
-  thoughtsFeelingsReflections: string;
 }
 
 interface PeriodData {
@@ -39,17 +32,30 @@ interface PeriodData {
   headaches: number;
   heartPalpitations: number;
   nightSweats: number;
+  cardio: number;
+  strength: number;
+  wife: number;
+  kids: number;
+  family: number;
+  friends: number;
+  neighbors: number;
+  coWorkers: number;
+  thoughtsFeelingsReflections: string;
 }
 
 interface MedEntry {
   medication: MedName;
-  doseMg: number;
+  dosage: number;
+  uom: string;
   taken: boolean;
 }
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
-const todayStr = () => new Date().toISOString().slice(0, 10);
+const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 const defaultDaily = (date: string): DailyData => ({
   timeOfWakingUp: `${date}T07:30`,
@@ -59,13 +65,6 @@ const defaultDaily = (date: string): DailyData => ({
   sleepHours: 8,
   cardio: 0,
   strength: 0,
-  wife: 5,
-  kids: 5,
-  family: 5,
-  friends: 5,
-  neighbors: 5,
-  coWorkers: 5,
-  thoughtsFeelingsReflections: '',
 });
 
 const defaultPeriod = (): PeriodData => ({
@@ -83,13 +82,23 @@ const defaultPeriod = (): PeriodData => ({
   headaches: 0,
   heartPalpitations: 0,
   nightSweats: 0,
+  cardio: 0,
+  strength: 0,
+  wife: 5,
+  kids: 5,
+  family: 5,
+  friends: 5,
+  neighbors: 5,
+  coWorkers: 5,
+  thoughtsFeelingsReflections: '',
 });
 
 const defaultMeds = (): MedEntry[] => [
-  { medication: 'perphenazine', doseMg: 4, taken: false },
-  { medication: 'lithium', doseMg: 1050, taken: false },
-  { medication: 'divalproex', doseMg: 1000, taken: false },
-  { medication: 'lamotrigine', doseMg: 200, taken: false },
+  { medication: 'perphenazine', dosage: 6,    uom: 'mg', taken: true  },
+  { medication: 'lithium',      dosage: 1050, uom: 'mg', taken: true  },
+  { medication: 'divalproex',   dosage: 1000, uom: 'mg', taken: true  },
+  { medication: 'lamotrigine',  dosage: 200,  uom: 'mg', taken: true  },
+  { medication: 'clonazepam',   dosage: 0,    uom: 'mg', taken: false },
 ];
 
 const blankPeriods = () => ({
@@ -97,13 +106,6 @@ const blankPeriods = () => ({
   afternoon: defaultPeriod(),
   evening: defaultPeriod(),
   night: defaultPeriod(),
-});
-
-const blankMeds = () => ({
-  morning: defaultMeds(),
-  afternoon: defaultMeds(),
-  evening: defaultMeds(),
-  night: defaultMeds(),
 });
 
 const blankLoaded = () => ({
@@ -200,23 +202,22 @@ export default function DailyLogForm() {
   const [date, setDate] = useState(todayStr());
   const [fetching, setFetching] = useState(false);
 
-  // Section 1
+  // Section 1 – Daily
   const [daily, setDaily] = useState<DailyData>(defaultDaily(todayStr()));
   const [dailyLoaded, setDailyLoaded] = useState(false);
   const [dailyStatus, setDailyStatus] = useState<SectionStatus>('idle');
   const [dailyErr, setDailyErr] = useState('');
 
-  // Section 2
+  // Section 2 – Period Log
   const [period, setPeriod] = useState<Period>('morning');
   const [periodData, setPeriodData] = useState<Record<Period, PeriodData>>(blankPeriods());
   const [periodLoaded, setPeriodLoaded] = useState<Record<Period, boolean>>(blankLoaded());
   const [periodStatus, setPeriodStatus] = useState<SectionStatus>('idle');
   const [periodErr, setPeriodErr] = useState('');
 
-  // Section 3
-  const [medPeriod, setMedPeriod] = useState<Period>('morning');
-  const [meds, setMeds] = useState<Record<Period, MedEntry[]>>(blankMeds());
-  const [medsLoaded, setMedsLoaded] = useState<Record<Period, boolean>>(blankLoaded());
+  // Section 3 – Medications (daily, not per-period)
+  const [meds, setMeds] = useState<MedEntry[]>(defaultMeds());
+  const [medsLoaded, setMedsLoaded] = useState(false);
   const [medsStatus, setMedsStatus] = useState<SectionStatus>('idle');
   const [medsErr, setMedsErr] = useState('');
 
@@ -226,15 +227,29 @@ export default function DailyLogForm() {
     setFetching(true);
     setDailyLoaded(false);
     setPeriodLoaded(blankLoaded());
-    setMedsLoaded(blankLoaded());
+    setMedsLoaded(false);
 
     try {
       // Daily
       const dr = await fetch(`/api/daily?date=${d}`);
       if (dr.ok) {
         const { record } = await dr.json();
-        setDaily(record ? record : defaultDaily(d));
-        setDailyLoaded(!!record);
+        if (record) {
+          const toLocalDT = (v: string | null) => (v ? v.slice(0, 16) : '');
+          setDaily({
+            timeOfWakingUp: toLocalDT(record.timeOfWakingUp) || `${d}T07:30`,
+            firstSocialInteraction: toLocalDT(record.firstSocialInteraction) || `${d}T07:30`,
+            firstActivityOrWorkStart: toLocalDT(record.firstActivityOrWorkStart) || `${d}T08:00`,
+            timeOfGoingToBed: toLocalDT(record.timeOfGoingToBed) || `${d}T22:30`,
+            sleepHours: Number(record.sleepHours ?? 8),
+            cardio: Number(record.cardio ?? 0),
+            strength: Number(record.strength ?? 0),
+          });
+          setDailyLoaded(true);
+        } else {
+          setDaily(defaultDaily(d));
+          setDailyLoaded(false);
+        }
       }
 
       // Period log
@@ -244,7 +259,7 @@ export default function DailyLogForm() {
         const updated = blankPeriods();
         const loaded = blankLoaded();
         for (const r of records ?? []) {
-          updated[r.period as Period] = r;
+          updated[r.period as Period] = { ...r, thoughtsFeelingsReflections: r.thoughtsFeelingsReflections ?? '' };
           loaded[r.period as Period] = true;
         }
         setPeriodData(updated);
@@ -255,16 +270,15 @@ export default function DailyLogForm() {
       const mr = await fetch(`/api/medications?date=${d}`);
       if (mr.ok) {
         const { records } = await mr.json();
-        const updated = blankMeds();
-        const loaded = blankLoaded();
-        for (const r of records ?? []) {
-          const p = r.period as Period;
-          const idx = updated[p].findIndex((m) => m.medication === r.medication);
-          if (idx >= 0) updated[p][idx] = { medication: r.medication, doseMg: r.dose_mg, taken: r.taken };
-          loaded[p] = true;
+        if (records?.length > 0) {
+          const updated = defaultMeds();
+          for (const r of records) {
+            const idx = updated.findIndex((m) => m.medication === r.medication);
+            if (idx >= 0) updated[idx] = { medication: r.medication, dosage: r.dosage, uom: r.uom, taken: r.taken };
+          }
+          setMeds(updated);
+          setMedsLoaded(true);
         }
-        setMeds(updated);
-        setMedsLoaded(loaded);
       }
     } catch (e) {
       console.error('Fetch error:', e);
@@ -302,12 +316,10 @@ export default function DailyLogForm() {
     setPeriodStatus('loading');
     setPeriodErr('');
     try {
-      const now = new Date();
-      const timestamp = `${date}T${now.toTimeString().slice(0, 8)}`;
       const res = await fetch('/api/period', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timestamp, date, period, ...periodData[period] }),
+        body: JSON.stringify({ date, period, ...periodData[period] }),
       });
       if (!res.ok) throw new Error((await res.json()).message);
       setPeriodStatus('success');
@@ -326,11 +338,11 @@ export default function DailyLogForm() {
       const res = await fetch('/api/medications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, period: medPeriod, medications: meds[medPeriod] }),
+        body: JSON.stringify({ date, medications: meds }),
       });
       if (!res.ok) throw new Error((await res.json()).message);
       setMedsStatus('success');
-      setMedsLoaded((p) => ({ ...p, [medPeriod]: true }));
+      setMedsLoaded(true);
       setTimeout(() => setMedsStatus('idle'), 3000);
     } catch (e) {
       setMedsStatus('error');
@@ -345,13 +357,12 @@ export default function DailyLogForm() {
   const setPeriodField = <K extends keyof PeriodData>(k: K, v: PeriodData[K]) =>
     setPeriodData((d) => ({ ...d, [period]: { ...d[period], [k]: v } }));
 
-  const updateMed = (p: Period, idx: number, field: keyof MedEntry, value: number | boolean) =>
-    setMeds((m) => ({ ...m, [p]: m[p].map((e, i) => (i === idx ? { ...e, [field]: value } : e)) }));
+  const updateMed = (idx: number, field: keyof MedEntry, value: number | boolean | string) =>
+    setMeds((m) => m.map((e, i) => (i === idx ? { ...e, [field]: value } : e)));
 
   const niceName = (k: string) => k.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
 
   const cur = periodData[period];
-  const curMeds = meds[medPeriod];
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
@@ -610,27 +621,6 @@ export default function DailyLogForm() {
             accent="#3d6a8a"
           />
 
-          <hr className="divider" />
-          <p className="sub-label">Social Quality (0–10)</p>
-          {(['wife', 'kids', 'family', 'friends', 'neighbors', 'coWorkers'] as (keyof DailyData)[]).map((k) => (
-            <Slider
-              key={k}
-              label={niceName(k)}
-              value={daily[k] as number}
-              onChange={(v) => setDailyField(k, v)}
-              accent="#d4a853"
-            />
-          ))}
-
-          <hr className="divider" />
-          <p className="sub-label">Reflections</p>
-          <textarea
-            className="reflections-area"
-            value={daily.thoughtsFeelingsReflections}
-            onChange={(e) => setDailyField('thoughtsFeelingsReflections', e.target.value)}
-            placeholder="Write freely…"
-          />
-
           <SubmitBar status={dailyStatus} label="Save Daily Entry" onSubmit={submitDaily} errorMsg={dailyErr} />
         </SectionCard>
 
@@ -659,7 +649,7 @@ export default function DailyLogForm() {
               ['triggersOrMajorStressors', '#c4552a'],
             ] as [keyof PeriodData, string][]
           ).map(([k, accent]) => (
-            <Slider key={k} label={niceName(k)} value={cur[k]} onChange={(v) => setPeriodField(k, v)} accent={accent} />
+            <Slider key={k} label={niceName(k)} value={cur[k] as number} onChange={(v) => setPeriodField(k, v)} accent={accent} />
           ))}
 
           <hr className="divider" />
@@ -679,6 +669,46 @@ export default function DailyLogForm() {
             )}
           </div>
 
+          <hr className="divider" />
+          <p className="sub-label">Exercise (min)</p>
+          <Slider
+            label="Cardio"
+            min={0}
+            max={120}
+            value={cur.cardio}
+            onChange={(v) => setPeriodField('cardio', v)}
+            accent="#3d6a8a"
+          />
+          <Slider
+            label="Strength"
+            min={0}
+            max={120}
+            value={cur.strength}
+            onChange={(v) => setPeriodField('strength', v)}
+            accent="#3d6a8a"
+          />
+
+          <hr className="divider" />
+          <p className="sub-label">Social Quality (0–10)</p>
+          {(['wife', 'kids', 'family', 'friends', 'neighbors', 'coWorkers'] as (keyof PeriodData)[]).map((k) => (
+            <Slider
+              key={k}
+              label={niceName(k)}
+              value={cur[k] as number}
+              onChange={(v) => setPeriodField(k, v)}
+              accent="#d4a853"
+            />
+          ))}
+
+          <hr className="divider" />
+          <p className="sub-label">Reflections</p>
+          <textarea
+            className="reflections-area"
+            value={cur.thoughtsFeelingsReflections}
+            onChange={(e) => setPeriodField('thoughtsFeelingsReflections', e.target.value)}
+            placeholder="Write freely…"
+          />
+
           <SubmitBar
             status={periodStatus}
             label={`Save ${niceName(period)} Entry`}
@@ -688,21 +718,8 @@ export default function DailyLogForm() {
         </SectionCard>
 
         {/* ══ SECTION 3: Medications ════════════════════════════════════════ */}
-        <SectionCard title="Medications" loaded={medsLoaded[medPeriod]}>
-          <div className="period-tabs">
-            {PERIODS.map((p) => (
-              <button
-                key={p}
-                className={`period-tab ${medPeriod === p ? 'active' : ''}`}
-                onClick={() => setMedPeriod(p)}
-              >
-                {p}
-                {medsLoaded[p] && <span className="dot" />}
-              </button>
-            ))}
-          </div>
-
-          {curMeds.map((med, idx) => (
+        <SectionCard title="Medications" loaded={medsLoaded}>
+          {meds.map((med, idx) => (
             <div key={med.medication} className="med-row">
               <span className="med-name">{MED_LABELS[med.medication]}</span>
               <div className="med-dose-wrap">
@@ -710,26 +727,21 @@ export default function DailyLogForm() {
                   type="number"
                   className="med-dose-input"
                   min={0}
-                  value={med.doseMg}
-                  onChange={(e) => updateMed(medPeriod, idx, 'doseMg', Number(e.target.value))}
+                  value={med.dosage}
+                  onChange={(e) => updateMed(idx, 'dosage', Number(e.target.value))}
                 />
-                <span className="med-unit">mg</span>
+                <span className="med-unit">{med.uom}</span>
               </div>
               <div
                 className={`med-taken ${med.taken ? 'taken' : ''}`}
-                onClick={() => updateMed(medPeriod, idx, 'taken', !med.taken)}
+                onClick={() => updateMed(idx, 'taken', !med.taken)}
               >
                 {med.taken ? '✓ taken' : 'not taken'}
               </div>
             </div>
           ))}
 
-          <SubmitBar
-            status={medsStatus}
-            label={`Save ${niceName(medPeriod)} Medications`}
-            onSubmit={submitMeds}
-            errorMsg={medsErr}
-          />
+          <SubmitBar status={medsStatus} label="Save Medications" onSubmit={submitMeds} errorMsg={medsErr} />
         </SectionCard>
       </div>
     </>

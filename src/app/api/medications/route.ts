@@ -11,9 +11,9 @@ export async function GET(req: NextRequest) {
   if (!date) return NextResponse.json({ message: 'date required' }, { status: 400 });
   try {
     const { rows } = await pool.query(
-      `SELECT period, medication, dose_mg, taken, notes
+      `SELECT medication, dosage, uom, taken
        FROM health.medication_log WHERE date = $1
-       ORDER BY period, medication`,
+       ORDER BY medication`,
       [date]
     );
     return NextResponse.json({ records: rows });
@@ -22,11 +22,10 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST accepts an array of medication entries for a given date + period
-// Body: { date, period, medications: [{ medication, doseMg, taken, notes }] }
+// POST body: { date, medications: [{ medication, dosage, uom, taken }] }
 export async function POST(req: NextRequest) {
   try {
-    const { date, period, medications } = await req.json();
+    const { date, medications } = await req.json();
 
     if (!Array.isArray(medications) || medications.length === 0) {
       return NextResponse.json({ message: 'medications array is required' }, { status: 400 });
@@ -36,15 +35,15 @@ export async function POST(req: NextRequest) {
     try {
       await pgClient.query('BEGIN');
 
-      for (const { medication, doseMg, taken = true, notes = null } of medications) {
+      for (const { medication, dosage, uom = 'mg', taken = true } of medications) {
         await pgClient.query(
-          `INSERT INTO health.medication_log (date, period, medication, dose_mg, taken, notes)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           ON CONFLICT (date, period, medication) DO UPDATE SET
-             dose_mg    = EXCLUDED.dose_mg,
-             taken      = EXCLUDED.taken,
-             notes      = EXCLUDED.notes`,
-          [date, period, medication, doseMg, taken, notes]
+          `INSERT INTO health.medication_log (date, medication, dosage, uom, taken)
+           VALUES ($1, $2, $3, $4, $5)
+           ON CONFLICT (date, medication) DO UPDATE SET
+             dosage = EXCLUDED.dosage,
+             uom    = EXCLUDED.uom,
+             taken  = EXCLUDED.taken`,
+          [date, medication, dosage, uom, taken]
         );
       }
 
