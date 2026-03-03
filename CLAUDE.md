@@ -26,6 +26,8 @@ npm run prettier
 
 Vercel auto-deploys on push to `master`. Development happens on `dev` — merge into `master` to deploy.
 
+Only merge `dev` into `master` and push when the user explicitly asks to deploy or push to production. "commit and push" means push to `dev` only.
+
 ## Architecture
 
 **Next.js 15 App Router** personal website with a health tracking dashboard.
