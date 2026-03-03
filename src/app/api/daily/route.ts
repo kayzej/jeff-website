@@ -58,7 +58,16 @@ export async function POST(req: NextRequest) {
         cardio                       = EXCLUDED.cardio,
         strength                     = EXCLUDED.strength,
         updated_at                   = NOW()`,
-      [date, timeOfWakingUp, firstSocialInteraction, firstActivityOrWorkStart, timeOfGoingToBed, sleepHours, cardio, strength]
+      [
+        date,
+        timeOfWakingUp,
+        firstSocialInteraction,
+        firstActivityOrWorkStart,
+        timeOfGoingToBed,
+        sleepHours,
+        cardio,
+        strength,
+      ]
     );
 
     return NextResponse.json({ success: true });

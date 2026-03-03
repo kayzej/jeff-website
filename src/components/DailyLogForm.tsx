@@ -94,11 +94,11 @@ const defaultPeriod = (): PeriodData => ({
 });
 
 const defaultMeds = (): MedEntry[] => [
-  { medication: 'perphenazine', dosage: 6,    uom: 'mg', taken: true  },
-  { medication: 'lithium',      dosage: 1050, uom: 'mg', taken: true  },
-  { medication: 'divalproex',   dosage: 1000, uom: 'mg', taken: true  },
-  { medication: 'lamotrigine',  dosage: 200,  uom: 'mg', taken: true  },
-  { medication: 'clonazepam',   dosage: 0,    uom: 'mg', taken: false },
+  { medication: 'perphenazine', dosage: 6, uom: 'mg', taken: true },
+  { medication: 'lithium', dosage: 1050, uom: 'mg', taken: true },
+  { medication: 'divalproex', dosage: 1000, uom: 'mg', taken: true },
+  { medication: 'lamotrigine', dosage: 200, uom: 'mg', taken: true },
+  { medication: 'clonazepam', dosage: 0, uom: 'mg', taken: false },
 ];
 
 const blankPeriods = () => ({
@@ -649,7 +649,13 @@ export default function DailyLogForm() {
               ['triggersOrMajorStressors', '#c4552a'],
             ] as [keyof PeriodData, string][]
           ).map(([k, accent]) => (
-            <Slider key={k} label={niceName(k)} value={cur[k] as number} onChange={(v) => setPeriodField(k, v)} accent={accent} />
+            <Slider
+              key={k}
+              label={niceName(k)}
+              value={cur[k] as number}
+              onChange={(v) => setPeriodField(k, v)}
+              accent={accent}
+            />
           ))}
 
           <hr className="divider" />
