@@ -204,7 +204,7 @@ export default function DailyLogForm() {
   const [dailyStatus, setDailyStatus] = useState<SectionStatus>('idle');
   const [dailyErr, setDailyErr] = useState('');
 
-  // Section 2 – Period Log
+  // Section 2 – Markers
   const [period, setPeriod] = useState<Period>('morning');
   const [periodData, setPeriodData] = useState<Record<Period, PeriodData>>(blankPeriods());
   const [periodLoaded, setPeriodLoaded] = useState<Record<Period, boolean>>(blankLoaded());
@@ -249,7 +249,7 @@ export default function DailyLogForm() {
       }
 
       // Period log
-      const pr = await fetch(`/api/period?date=${d}`);
+      const pr = await fetch(`/api/markers?date=${d}`);
       if (pr.ok) {
         const { records } = await pr.json();
         const updated = blankPeriods();
@@ -312,7 +312,7 @@ export default function DailyLogForm() {
     setPeriodStatus('loading');
     setPeriodErr('');
     try {
-      const res = await fetch('/api/period', {
+      const res = await fetch('/api/markers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date, period, ...periodData[period] }),
@@ -620,8 +620,8 @@ export default function DailyLogForm() {
           <SubmitBar status={dailyStatus} label="Save Daily Entry" onSubmit={submitDaily} errorMsg={dailyErr} />
         </SectionCard>
 
-        {/* ══ SECTION 2: Period Log ═════════════════════════════════════════ */}
-        <SectionCard title="Period Log" loaded={periodLoaded[period]}>
+        {/* ══ SECTION 2: Markers ═════════════════════════════════════════ */}
+        <SectionCard title="Markers" loaded={periodLoaded[period]}>
           <div className="period-tabs">
             {PERIODS.map((p) => (
               <button key={p} className={`period-tab ${period === p ? 'active' : ''}`} onClick={() => setPeriod(p)}>

@@ -26,7 +26,7 @@ type MetricKey =
   | 'neighbors'
   | 'coWorkers';
 
-interface PeriodRecord {
+interface MarkersRecord {
   date: string;
   period: string;
   [key: string]: string | number | null;
@@ -118,7 +118,7 @@ const daysAgoStr = (n: number) => {
 };
 
 function buildChartData(
-  records: PeriodRecord[],
+  records: MarkersRecord[],
   metrics: MetricKey[]
 ): { date: string; [key: string]: number | null | string }[] {
   const byDate: Record<string, Partial<Record<MetricKey, number[]>>> = {};
@@ -147,11 +147,11 @@ function buildChartData(
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export default function PeriodChart() {
+export default function MarkersChart() {
   const [startDate, setStartDate] = useState(daysAgoStr(7));
   const [endDate, setEndDate] = useState(todayStr());
   const [selectedMetrics, setSelectedMetrics] = useState<Set<MetricKey>>(new Set(['mood']));
-  const [records, setRecords] = useState<PeriodRecord[]>([]);
+  const [records, setRecords] = useState<MarkersRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -159,7 +159,7 @@ export default function PeriodChart() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`/api/period/range?start=${start}&end=${end}`);
+      const res = await fetch(`/api/markers/range?start=${start}&end=${end}`);
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.message ?? 'Failed to fetch');

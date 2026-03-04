@@ -124,7 +124,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[period_log]', error);
+    console.error('[markers]', error);
     return NextResponse.json({ message: error instanceof Error ? error.message : 'Database error' }, { status: 500 });
   }
 }
