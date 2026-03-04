@@ -59,12 +59,17 @@ const METRIC_COLORS: Record<MetricKey, string> = {
 
 const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }[] }[] = [
   {
-    label: 'Mental State',
+    label: 'Mental (Positive)',
     metrics: [
       { key: 'mood', label: 'Mood' },
       { key: 'energyLevel', label: 'Energy Level' },
       { key: 'motivation', label: 'Motivation' },
       { key: 'productivity', label: 'Productivity' },
+    ],
+  },
+  {
+    label: 'Mental (Negative)',
+    metrics: [
       { key: 'anxiety', label: 'Anxiety' },
       { key: 'depression', label: 'Depression' },
       { key: 'moodSwings', label: 'Mood Swings' },
