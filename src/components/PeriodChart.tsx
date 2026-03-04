@@ -96,6 +96,7 @@ const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }
 ];
 
 const ALL_METRICS = METRIC_GROUPS.flatMap((g) => g.metrics);
+const ALL_METRIC_KEYS = ALL_METRICS.map((m) => m.key);
 const labelOf = (key: MetricKey) => ALL_METRICS.find((m) => m.key === key)?.label ?? key;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -175,11 +176,33 @@ export default function PeriodChart() {
   const chartData = buildChartData(records, activeMetrics);
   const hasData = !loading && chartData.length > 0;
 
+  const allSelected = ALL_METRIC_KEYS.every((k) => selectedMetrics.has(k));
+
+  const toggleAll = () => {
+    setSelectedMetrics(allSelected ? new Set() : new Set(ALL_METRIC_KEYS));
+  };
+
+  const toggleCategory = (groupLabel: string) => {
+    const group = METRIC_GROUPS.find((g) => g.label === groupLabel);
+    if (!group) return;
+    const keys = group.metrics.map((m) => m.key);
+    const allInGroup = keys.every((k) => selectedMetrics.has(k));
+    setSelectedMetrics((prev) => {
+      const next = new Set(prev);
+      if (allInGroup) {
+        keys.forEach((k) => next.delete(k));
+      } else {
+        keys.forEach((k) => next.add(k));
+      }
+      return next;
+    });
+  };
+
   const toggleMetric = (key: MetricKey) => {
     setSelectedMetrics((prev) => {
       const next = new Set(prev);
       if (next.has(key)) {
-        if (next.size > 1) next.delete(key); // keep at least one
+        next.delete(key);
       } else {
         next.add(key);
       }
@@ -243,12 +266,39 @@ export default function PeriodChart() {
           padding-bottom: 2rem;
           border-bottom: 1px solid rgba(232,228,223,0.08);
         }
+        .bulk-toggles {
+          display: flex; align-items: center; gap: 0.5rem;
+          margin-bottom: 1.25rem; flex-wrap: wrap;
+        }
+        .bulk-label {
+          font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
+          color: rgba(232,228,223,0.2); margin-right: 0.25rem;
+        }
+        .bulk-btn {
+          font-family: 'DM Mono', monospace; font-size: 0.6rem;
+          letter-spacing: 0.12em; text-transform: uppercase;
+          padding: 0.22rem 0.6rem; border-radius: 3px;
+          border: 1px solid rgba(232,228,223,0.12);
+          background: transparent; color: rgba(232,228,223,0.3);
+          cursor: pointer; transition: all 0.15s; user-select: none;
+        }
+        .bulk-btn:hover { border-color: rgba(232,228,223,0.28); color: rgba(232,228,223,0.6); }
+        .bulk-btn.active {
+          border-color: rgba(232,228,223,0.4); color: rgba(232,228,223,0.8);
+          background: rgba(232,228,223,0.06);
+        }
         .metric-group { margin-bottom: 0.85rem; }
         .metric-group:last-child { margin-bottom: 0; }
-        .metric-group-label {
-          font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
-          color: rgba(232,228,223,0.22); margin-bottom: 0.45rem;
+        .metric-group-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.45rem; }
+        .metric-group-toggle {
+          font-family: 'DM Mono', monospace; font-size: 0.58rem;
+          letter-spacing: 0.22em; text-transform: uppercase;
+          background: transparent; border: none; padding: 0;
+          color: rgba(232,228,223,0.22); cursor: pointer;
+          transition: color 0.15s; user-select: none;
         }
+        .metric-group-toggle:hover { color: rgba(232,228,223,0.5); }
+        .metric-group-toggle.active { color: rgba(232,228,223,0.6); text-decoration: underline; text-underline-offset: 3px; }
         .metric-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
         .metric-chip {
           font-family: 'DM Mono', monospace; font-size: 0.62rem;
@@ -324,35 +374,58 @@ export default function PeriodChart() {
 
         {/* Metric selector */}
         <div className="metric-selector">
-          {METRIC_GROUPS.map((group) => (
-            <div key={group.label} className="metric-group">
-              <p className="metric-group-label">{group.label}</p>
-              <div className="metric-chips">
-                {group.metrics.map(({ key, label }) => {
-                  const active = selectedMetrics.has(key);
-                  const color = METRIC_COLORS[key];
-                  return (
-                    <button
-                      key={key}
-                      className="metric-chip"
-                      onClick={() => toggleMetric(key)}
-                      style={
-                        active
-                          ? {
-                              borderColor: color,
-                              color: color,
-                              background: `${color}18`,
-                            }
-                          : undefined
-                      }
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
+          <div className="bulk-toggles">
+            <span className="bulk-label">Toggle</span>
+            <button className={`bulk-btn${allSelected ? ' active' : ''}`} onClick={toggleAll}>
+              All
+            </button>
+            {METRIC_GROUPS.map((group) => {
+              const keys = group.metrics.map((m) => m.key);
+              const allInGroup = keys.every((k) => selectedMetrics.has(k));
+              return (
+                <button
+                  key={group.label}
+                  className={`bulk-btn${allInGroup ? ' active' : ''}`}
+                  onClick={() => toggleCategory(group.label)}
+                >
+                  {group.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {METRIC_GROUPS.map((group) => {
+            const keys = group.metrics.map((m) => m.key);
+            const allInGroup = keys.every((k) => selectedMetrics.has(k));
+            return (
+              <div key={group.label} className="metric-group">
+                <div className="metric-group-header">
+                  <button
+                    className={`metric-group-toggle${allInGroup ? ' active' : ''}`}
+                    onClick={() => toggleCategory(group.label)}
+                  >
+                    {group.label}
+                  </button>
+                </div>
+                <div className="metric-chips">
+                  {group.metrics.map(({ key, label }) => {
+                    const active = selectedMetrics.has(key);
+                    const color = METRIC_COLORS[key];
+                    return (
+                      <button
+                        key={key}
+                        className="metric-chip"
+                        onClick={() => toggleMetric(key)}
+                        style={active ? { borderColor: color, color: color, background: `${color}18` } : undefined}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {error && <p className="error-msg">{error}</p>}
@@ -367,7 +440,9 @@ export default function PeriodChart() {
             </span>
           </div>
 
-          {!loading && chartData.length === 0 ? (
+          {!loading && activeMetrics.length === 0 ? (
+            <p className="empty-state">Select a metric above</p>
+          ) : !loading && chartData.length === 0 ? (
             <p className="empty-state">No data for this range</p>
           ) : (
             <>
