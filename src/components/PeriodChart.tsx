@@ -365,7 +365,7 @@ export default function PeriodChart() {
       `}</style>
 
       <div className="chart-wrap">
-        <h1 className="chart-title">Period Chart</h1>
+        <h1 className="chart-title">Markers Graph</h1>
         <p className="chart-subtitle">Trends · Averaged Daily</p>
 
         {/* Date range */}

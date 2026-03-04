@@ -15,7 +15,7 @@ const Navbar = () => {
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Daily Log', href: '/dailyLog' },
-    { label: 'Period Chart', href: '/periodChart' },
+    { label: 'Markers Graph', href: '/periodChart' },
     { label: 'Resume', onClick: handleResumeDownload }, // Use onClick for the Resume button
   ];
 
