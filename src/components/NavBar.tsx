@@ -16,6 +16,7 @@ const Navbar = () => {
     { label: 'About', href: '/about' },
     { label: 'Daily Log', href: '/dailyLog' },
     { label: 'Markers Graph', href: '/periodChart' },
+    { label: 'Markers Detail', href: '/markersDetail' },
     { label: 'Resume', onClick: handleResumeDownload }, // Use onClick for the Resume button
   ];
 
@@ -28,7 +29,7 @@ const Navbar = () => {
               key={index}
               color="inherit"
               href={button.href}
-              onClick={button.onClick} // Only applies if the button has an onClick handler
+              onClick={button.onClick}
               sx={{ fontWeight: 'bold', fontSize: '1.2rem' }}
             >
               {button.label}
