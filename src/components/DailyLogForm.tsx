@@ -32,8 +32,6 @@ interface PeriodData {
   headaches: number;
   heartPalpitations: number;
   nightSweats: number;
-  cardio: number;
-  strength: number;
   wife: number;
   kids: number;
   family: number;
@@ -82,8 +80,6 @@ const defaultPeriod = (): PeriodData => ({
   headaches: 0,
   heartPalpitations: 0,
   nightSweats: 0,
-  cardio: 0,
-  strength: 0,
   wife: 5,
   kids: 5,
   family: 5,
@@ -674,25 +670,6 @@ export default function DailyLogForm() {
               )
             )}
           </div>
-
-          <hr className="divider" />
-          <p className="sub-label">Exercise (min)</p>
-          <Slider
-            label="Cardio"
-            min={0}
-            max={120}
-            value={cur.cardio}
-            onChange={(v) => setPeriodField('cardio', v)}
-            accent="#3d6a8a"
-          />
-          <Slider
-            label="Strength"
-            min={0}
-            max={120}
-            value={cur.strength}
-            onChange={(v) => setPeriodField('strength', v)}
-            accent="#3d6a8a"
-          />
 
           <hr className="divider" />
           <p className="sub-label">Social Quality (0–10)</p>

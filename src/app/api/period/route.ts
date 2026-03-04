@@ -23,7 +23,6 @@ export async function GET(req: NextRequest) {
         tremors, dizziness, headaches,
         heart_palpitations            AS "heartPalpitations",
         night_sweats                  AS "nightSweats",
-        cardio, strength,
         wife, kids, family, friends, neighbors,
         co_workers                    AS "coWorkers",
         thoughts_feelings_reflections AS "thoughtsFeelingsReflections"
@@ -55,8 +54,6 @@ export async function POST(req: NextRequest) {
       headaches,
       heartPalpitations,
       nightSweats,
-      cardio,
-      strength,
       wife,
       kids,
       family,
@@ -73,10 +70,9 @@ export async function POST(req: NextRequest) {
         mood_swings, racing_thoughts, triggers_or_major_stressors,
         motivation, productivity,
         tremors, dizziness, headaches, heart_palpitations, night_sweats,
-        cardio, strength,
         wife, kids, family, friends, neighbors, co_workers,
         thoughts_feelings_reflections
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
       ON CONFLICT (date, period) DO UPDATE SET
         mood                          = EXCLUDED.mood,
         energy_level                  = EXCLUDED.energy_level,
@@ -92,8 +88,6 @@ export async function POST(req: NextRequest) {
         headaches                     = EXCLUDED.headaches,
         heart_palpitations            = EXCLUDED.heart_palpitations,
         night_sweats                  = EXCLUDED.night_sweats,
-        cardio                        = EXCLUDED.cardio,
-        strength                      = EXCLUDED.strength,
         wife                          = EXCLUDED.wife,
         kids                          = EXCLUDED.kids,
         family                        = EXCLUDED.family,
@@ -118,8 +112,6 @@ export async function POST(req: NextRequest) {
         headaches,
         heartPalpitations,
         nightSweats,
-        cardio,
-        strength,
         wife,
         kids,
         family,
