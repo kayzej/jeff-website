@@ -1,8 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import AbstractBackground from '@/components/AbstractBackground';
 
 export default function About() {
   return (
     <main className="">
+      <AbstractBackground />
       <div>
         <h1 className="text-white font-extrabold">About</h1>
         <p className="text-white mt-4">

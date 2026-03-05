@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import AbstractBackground from '@/components/AbstractBackground';
 import Navbar from '@/components/NavBar';
 
 export const metadata: Metadata = {
@@ -16,7 +15,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body style={{ background: '#0a0a0f' }}>
-        <AbstractBackground />
         <Navbar />
         {children}
       </body>
