@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Period = 'morning' | 'afternoon' | 'evening' | 'night';
-type MedName = 'perphenazine' | 'lithium' | 'divalproex' | 'lamotrigine' | 'clonazepam';
+type MedName = 'perphenazine' | 'lithium' | 'divalproex' | 'lamotrigine' | 'clonazepam' | 'wegovy';
 type SectionStatus = 'idle' | 'loading' | 'success' | 'error';
 
 interface DailyData {
@@ -95,6 +95,7 @@ const defaultMeds = (): MedEntry[] => [
   { medication: 'divalproex', dosage: 1000, uom: 'mg', taken: true },
   { medication: 'lamotrigine', dosage: 200, uom: 'mg', taken: true },
   { medication: 'clonazepam', dosage: 0, uom: 'mg', taken: false },
+  { medication: 'wegovy', dosage: 0, uom: 'mg', taken: false },
 ];
 
 const blankPeriods = () => ({
@@ -119,6 +120,7 @@ const MED_LABELS: Record<MedName, string> = {
   divalproex: 'Divalproex',
   lamotrigine: 'Lamotrigine',
   clonazepam: 'Clonazepam',
+  wegovy: 'Wegovy',
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
