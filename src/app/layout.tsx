@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body style={{ background: '#212529' }}>
+      <body style={{ background: '#0a0a0f' }}>
         <Navbar />
         {children}
       </body>
