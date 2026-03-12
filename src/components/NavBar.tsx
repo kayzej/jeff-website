@@ -27,7 +27,11 @@ const Navbar = () => {
   ];
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: isTransparent ? 'transparent' : '#212529', color: 'white', fontWeight: 'bold' }} elevation={0}>
+    <AppBar
+      position="static"
+      sx={{ backgroundColor: isTransparent ? 'transparent' : '#212529', color: 'white', fontWeight: 'bold' }}
+      elevation={0}
+    >
       <Toolbar sx={{ color: 'white', fontWeight: 'bold', justifyContent: 'center' }}>
         <Box>
           {buttons.map((button, index) => (

@@ -431,7 +431,9 @@ export default function MarkersDetailChart() {
 
         {/* Date range */}
         <div className="detail-date-row">
-          <button className="detail-nav-btn" onClick={() => shiftRange(-1)}>←</button>
+          <button className="detail-nav-btn" onClick={() => shiftRange(-1)}>
+            ←
+          </button>
           <span className="detail-ctrl-label">From</span>
           <input
             type="date"
@@ -446,7 +448,9 @@ export default function MarkersDetailChart() {
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
-          <button className="detail-nav-btn" onClick={() => shiftRange(1)}>→</button>
+          <button className="detail-nav-btn" onClick={() => shiftRange(1)}>
+            →
+          </button>
           {[7, 14, 30].map((d) => (
             <button key={d} className="detail-preset-btn" onClick={() => setPreset(d)}>
               {d}d
@@ -593,7 +597,10 @@ export default function MarkersDetailChart() {
                 <div className="period-legend">
                   {PERIOD_ORDER.map((p) => (
                     <div key={p} className="period-legend-item">
-                      <div className="period-swatch" style={{ background: PERIOD_BG[p] ?? 'transparent', border: '1px solid rgba(232,228,223,0.1)' }} />
+                      <div
+                        className="period-swatch"
+                        style={{ background: PERIOD_BG[p] ?? 'transparent', border: '1px solid rgba(232,228,223,0.1)' }}
+                      />
                       {p}
                     </div>
                   ))}

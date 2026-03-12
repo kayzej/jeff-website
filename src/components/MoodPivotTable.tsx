@@ -345,12 +345,7 @@ export default function MoodPivotTable() {
               <tr>
                 <th className="metric-col">Metric</th>
                 {PERIODS.map((p) => (
-                  <th
-                    key={p}
-                    style={
-                      periodsPresent.includes(p) ? { color: 'rgba(232,228,223,0.55)' } : undefined
-                    }
-                  >
+                  <th key={p} style={periodsPresent.includes(p) ? { color: 'rgba(232,228,223,0.55)' } : undefined}>
                     {p}
                   </th>
                 ))}
@@ -373,11 +368,7 @@ export default function MoodPivotTable() {
                   return (
                     <>
                       {/* Group header row */}
-                      <tr
-                        key={`grp-${group.label}`}
-                        className="group-row"
-                        onClick={() => toggleGroup(group.label)}
-                      >
+                      <tr key={`grp-${group.label}`} className="group-row" onClick={() => toggleGroup(group.label)}>
                         <td className="metric-col" style={{ paddingLeft: '0.85rem' }}>
                           <span className="group-label">
                             <span className="group-toggle">{expanded ? '▼' : '▶'}</span>
@@ -448,7 +439,9 @@ export default function MoodPivotTable() {
                               })}
                               <td
                                 className="avg-cell"
-                                style={avg !== null ? { color: cellColor(avg, positive), fontWeight: 'bold' } : undefined}
+                                style={
+                                  avg !== null ? { color: cellColor(avg, positive), fontWeight: 'bold' } : undefined
+                                }
                               >
                                 {avg !== null ? avg : <span className="null-val">—</span>}
                               </td>
