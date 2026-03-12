@@ -4,7 +4,7 @@ import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, L
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type MetricKey = 'wakeTime' | 'socialTime' | 'workStart' | 'bedTime' | 'sleepHours' | 'cardio' | 'strength';
+type MetricKey = 'wakeTime' | 'socialTime' | 'workStart' | 'bedTime' | 'sleepHours' | 'cardio' | 'strength' | 'mood';
 
 interface DailyRecord {
   date: string;
@@ -15,6 +15,7 @@ interface DailyRecord {
   sleepHours: string | number | null;
   cardio: string | number | null;
   strength: string | number | null;
+  mood: string | number | null;
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -29,6 +30,7 @@ const METRIC_CONFIGS: Record<MetricKey, { defaultVal: number; spread: number; in
   sleepHours: { defaultVal: 8, spread: 4 }, // 8 h, ±4 h
   cardio: { defaultVal: 0, spread: 60 }, // 0 min, 60 min = +4 pts
   strength: { defaultVal: 0, spread: 60 },
+  mood: { defaultVal: 5, spread: 4 }, // already 1–10; maps linearly
 };
 
 const METRIC_COLORS: Record<MetricKey, string> = {
@@ -39,6 +41,7 @@ const METRIC_COLORS: Record<MetricKey, string> = {
   sleepHours: '#d4a853',
   cardio: '#6dbf8a',
   strength: '#5aab77',
+  mood: '#c47eb5',
 };
 
 const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }[] }[] = [
@@ -54,6 +57,7 @@ const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }
   {
     label: 'Health',
     metrics: [
+      { key: 'mood', label: 'Mood' },
       { key: 'sleepHours', label: 'Sleep Hours' },
       { key: 'cardio', label: 'Cardio' },
       { key: 'strength', label: 'Strength' },
@@ -120,6 +124,9 @@ function buildChartData(
           break;
         case 'strength':
           raw = r.strength !== null ? Number(r.strength) : null;
+          break;
+        case 'mood':
+          raw = r.mood !== null ? Number(r.mood) : null;
           break;
       }
       const cfg = METRIC_CONFIGS[m];
