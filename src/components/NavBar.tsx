@@ -22,7 +22,6 @@ const Navbar = () => {
     { label: 'Daily Stats', href: '/dailyStats' },
     { label: 'Markers Graph', href: '/markersGraph' },
     { label: 'Markers Detail', href: '/markersDetail' },
-    { label: 'Mood Pivot', href: '/moodPivot' },
     { label: 'Resume', onClick: handleResumeDownload }, // Use onClick for the Resume button
   ];
 
