@@ -20,8 +20,9 @@ interface DailyRecord {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 // Defaults from DailyLogForm; spread = raw-unit change that equals ±4 points
-const METRIC_CONFIGS: Record<MetricKey, { defaultVal: number; spread: number }> = {
-  wakeTime: { defaultVal: 450, spread: 120 }, // 07:30 = 450 min, ±2 h
+// invert: true means higher raw value = worse (e.g. waking up later is negative)
+const METRIC_CONFIGS: Record<MetricKey, { defaultVal: number; spread: number; invert?: boolean }> = {
+  wakeTime: { defaultVal: 450, spread: 120, invert: true }, // 07:30 = 450 min, ±2 h — earlier is better
   socialTime: { defaultVal: 450, spread: 120 },
   workStart: { defaultVal: 480, spread: 120 }, // 08:00 = 480 min
   bedTime: { defaultVal: 1350, spread: 120 }, // 22:30 = 1350 min
@@ -84,8 +85,9 @@ function tsToMinutes(ts: string | null): number | null {
   return parseInt(m[1]) * 60 + parseInt(m[2]);
 }
 
-function normalize(value: number, defaultVal: number, spread: number): number {
-  const n = 5 + ((value - defaultVal) / spread) * 4;
+function normalize(value: number, defaultVal: number, spread: number, invert = false): number {
+  const direction = invert ? -1 : 1;
+  const n = 5 + direction * ((value - defaultVal) / spread) * 4;
   return Math.round(Math.max(1, Math.min(10, n)) * 10) / 10;
 }
 
@@ -121,7 +123,7 @@ function buildChartData(
           break;
       }
       const cfg = METRIC_CONFIGS[m];
-      point[m] = raw !== null ? normalize(raw, cfg.defaultVal, cfg.spread) : null;
+      point[m] = raw !== null ? normalize(raw, cfg.defaultVal, cfg.spread, cfg.invert) : null;
     }
     return point;
   });

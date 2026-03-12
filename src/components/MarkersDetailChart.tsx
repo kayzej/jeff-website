@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
-import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line } from 'recharts';
+import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, ReferenceArea } from 'recharts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -42,6 +42,12 @@ interface DataPoint {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const PERIOD_ORDER = ['morning', 'afternoon', 'evening', 'night'];
+const PERIOD_BG: Record<string, string> = {
+  morning: 'rgba(255,210,100,0.07)',
+  afternoon: 'rgba(255,245,200,0.04)',
+  evening: 'rgba(210,120,60,0.09)',
+  night: 'rgba(70,90,180,0.12)',
+};
 const PERIOD_SHORT: Record<string, string> = {
   morning: 'AM',
   afternoon: 'PM',
@@ -163,6 +169,23 @@ export default function MarkersDetailChart() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const shiftRange = (direction: -1 | 1) => {
+    const s = new Date(startDate + 'T00:00:00');
+    const e = new Date(endDate + 'T00:00:00');
+    const span = Math.round((e.getTime() - s.getTime()) / 86400000) + 1;
+    s.setDate(s.getDate() + direction * span);
+    e.setDate(e.getDate() + direction * span);
+    const fmt = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    setStartDate(fmt(s));
+    setEndDate(fmt(e));
+  };
+
+  const setPreset = (days: number) => {
+    setEndDate(todayStr());
+    setStartDate(daysAgoStr(days - 1));
+  };
+
   const fetchRecords = useCallback(async (start: string, end: string) => {
     setLoading(true);
     setError('');
@@ -262,6 +285,23 @@ export default function MarkersDetailChart() {
           outline: none; color-scheme: dark; transition: border-color 0.2s;
         }
         .detail-ctrl-input:focus { border-color: rgba(212,168,83,0.5); }
+        .detail-nav-btn {
+          background: rgba(232,228,223,0.04);
+          border: 1px solid rgba(232,228,223,0.12); border-radius: 4px;
+          color: rgba(232,228,223,0.45); font-family: 'DM Mono', monospace;
+          font-size: 0.8rem; padding: 0.5rem 0.75rem;
+          cursor: pointer; transition: all 0.15s; user-select: none;
+        }
+        .detail-nav-btn:hover { border-color: rgba(232,228,223,0.28); color: rgba(232,228,223,0.7); }
+        .detail-preset-btn {
+          font-family: 'DM Mono', monospace; font-size: 0.6rem;
+          letter-spacing: 0.12em; text-transform: uppercase;
+          padding: 0.35rem 0.6rem; border-radius: 3px;
+          border: 1px solid rgba(232,228,223,0.1);
+          background: transparent; color: rgba(232,228,223,0.3);
+          cursor: pointer; transition: all 0.15s; user-select: none;
+        }
+        .detail-preset-btn:hover { border-color: rgba(232,228,223,0.25); color: rgba(232,228,223,0.6); }
         .detail-loading {
           font-size: 0.65rem; letter-spacing: 0.15em;
           color: rgba(212,168,83,0.5); text-transform: uppercase;
@@ -348,6 +388,21 @@ export default function MarkersDetailChart() {
           color: rgba(232,228,223,0.2);
         }
 
+        /* Period band legend */
+        .period-legend {
+          display: flex; gap: 1.25rem; flex-wrap: wrap;
+          margin-top: 1rem; padding-top: 0.85rem;
+          border-top: 1px solid rgba(232,228,223,0.06);
+        }
+        .period-legend-item {
+          display: flex; align-items: center; gap: 0.4rem;
+          font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+          color: rgba(232,228,223,0.35);
+        }
+        .period-swatch {
+          width: 14px; height: 14px; border-radius: 2px; flex-shrink: 0;
+        }
+
         /* Legend */
         .detail-legend {
           display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem;
@@ -376,6 +431,7 @@ export default function MarkersDetailChart() {
 
         {/* Date range */}
         <div className="detail-date-row">
+          <button className="detail-nav-btn" onClick={() => shiftRange(-1)}>←</button>
           <span className="detail-ctrl-label">From</span>
           <input
             type="date"
@@ -390,6 +446,12 @@ export default function MarkersDetailChart() {
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
+          <button className="detail-nav-btn" onClick={() => shiftRange(1)}>→</button>
+          {[7, 14, 30].map((d) => (
+            <button key={d} className="detail-preset-btn" onClick={() => setPreset(d)}>
+              {d}d
+            </button>
+          ))}
           {loading && <span className="detail-loading">Loading…</span>}
         </div>
 
@@ -478,6 +540,16 @@ export default function MarkersDetailChart() {
                     axisLine={{ stroke: 'rgba(232,228,223,0.1)' }}
                   />
                   <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={28} />
+                  {chartData.map((point) => (
+                    <ReferenceArea
+                      key={point.x}
+                      x1={point.x}
+                      x2={point.x}
+                      fill={PERIOD_BG[point.period] ?? 'transparent'}
+                      strokeOpacity={0}
+                      ifOverflow="visible"
+                    />
+                  ))}
                   <Tooltip
                     contentStyle={{
                       background: '#1a1a1a',
@@ -513,6 +585,16 @@ export default function MarkersDetailChart() {
                     <div key={key} className="detail-legend-item">
                       <div className="detail-legend-swatch" style={{ background: METRIC_COLORS[key] }} />
                       {labelOf(key)}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {hasData && (
+                <div className="period-legend">
+                  {PERIOD_ORDER.map((p) => (
+                    <div key={p} className="period-legend-item">
+                      <div className="period-swatch" style={{ background: PERIOD_BG[p] ?? 'transparent', border: '1px solid rgba(232,228,223,0.1)' }} />
+                      {p}
                     </div>
                   ))}
                 </div>

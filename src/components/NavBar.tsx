@@ -1,8 +1,12 @@
 'use client';
 import React from 'react';
+import { usePathname } from 'next/navigation';
 import { AppBar, Toolbar, Button, Box } from '@mui/material';
 
 const Navbar = () => {
+  const pathname = usePathname();
+  const isTransparent = pathname === '/' || pathname === '/about';
+
   const handleResumeDownload = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     const link = document.createElement('a');
@@ -18,11 +22,12 @@ const Navbar = () => {
     { label: 'Daily Stats', href: '/dailyStats' },
     { label: 'Markers Graph', href: '/markersGraph' },
     { label: 'Markers Detail', href: '/markersDetail' },
+    { label: 'Mood Pivot', href: '/moodPivot' },
     { label: 'Resume', onClick: handleResumeDownload }, // Use onClick for the Resume button
   ];
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: 'transparent', color: 'white', fontWeight: 'bold' }} elevation={0}>
+    <AppBar position="static" sx={{ backgroundColor: isTransparent ? 'transparent' : '#212529', color: 'white', fontWeight: 'bold' }} elevation={0}>
       <Toolbar sx={{ color: 'white', fontWeight: 'bold', justifyContent: 'center' }}>
         <Box>
           {buttons.map((button, index) => (
