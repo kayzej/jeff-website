@@ -13,7 +13,8 @@ type MetricKey =
   | 'cardio'
   | 'strength'
   | 'mood'
-  | 'klonopinDose';
+  | 'klonopinDose'
+  | 'wegovyDose';
 
 interface DailyRecord {
   date: string;
@@ -26,6 +27,7 @@ interface DailyRecord {
   strength: string | number | null;
   mood: string | number | null;
   klonopinDose: string | number | null;
+  wegovyDose: string | number | null;
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -42,6 +44,7 @@ const METRIC_CONFIGS: Record<MetricKey, { defaultVal: number; spread: number; in
   strength: { defaultVal: 0, spread: 60 },
   mood: { defaultVal: 5, spread: 4 }, // already 1–10; maps linearly
   klonopinDose: { defaultVal: 0, spread: 2 }, // 0mg=5, 0.5mg=6, 1mg=7, etc.
+  wegovyDose: { defaultVal: 0, spread: 2 }, // 0mg=5, 0.5mg=6, 1mg=7, etc.
 };
 
 const METRIC_COLORS: Record<MetricKey, string> = {
@@ -54,6 +57,7 @@ const METRIC_COLORS: Record<MetricKey, string> = {
   strength: '#5aab77',
   mood: '#c47eb5',
   klonopinDose: '#e07a5f',
+  wegovyDose: '#7ec8c8',
 };
 
 const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }[] }[] = [
@@ -74,6 +78,7 @@ const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }
       { key: 'cardio', label: 'Cardio' },
       { key: 'strength', label: 'Strength' },
       { key: 'klonopinDose', label: 'Klonopin' },
+      { key: 'wegovyDose', label: 'Wegovy' },
     ],
   },
 ];
@@ -143,6 +148,9 @@ function buildChartData(
           break;
         case 'klonopinDose':
           raw = r.klonopinDose !== null ? Number(r.klonopinDose) : null;
+          break;
+        case 'wegovyDose':
+          raw = r.wegovyDose !== null ? Number(r.wegovyDose) : null;
           break;
       }
       const cfg = METRIC_CONFIGS[m];

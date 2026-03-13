@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
         d.cardio,
         d.strength,
         p.avg_mood                           AS "mood",
-        k.klonopin_dose                      AS "klonopinDose"
+        k.klonopin_dose                      AS "klonopinDose",
+        w.wegovy_dose                        AS "wegovyDose"
       FROM health.daily_log d
       LEFT JOIN (
         SELECT date, AVG(mood) AS avg_mood
@@ -31,12 +32,17 @@ export async function GET(req: NextRequest) {
         GROUP BY date
       ) p ON p.date = d.date
       LEFT JOIN (
-        SELECT date, SUM(dosage) AS klonopin_dose
+        SELECT date, dosage AS klonopin_dose
         FROM health.medication_log
         WHERE medication = 'clonazepam' AND taken = true
           AND date >= $1 AND date <= $2
-        GROUP BY date
       ) k ON k.date = d.date
+      LEFT JOIN (
+        SELECT date, dosage AS wegovy_dose
+        FROM health.medication_log
+        WHERE medication = 'wegovy' AND taken = true
+          AND date >= $1 AND date <= $2
+      ) w ON w.date = d.date
       WHERE d.date >= $1 AND d.date <= $2
       ORDER BY d.date`,
       [start, end]

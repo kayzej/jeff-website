@@ -123,6 +123,15 @@ const MED_LABELS: Record<MedName, string> = {
   wegovy: 'Wegovy',
 };
 
+const MED_STEPS: Record<MedName, number> = {
+  perphenazine: 1,
+  lithium: 50,
+  divalproex: 250,
+  lamotrigine: 25,
+  clonazepam: 0.5,
+  wegovy: 0.25,
+};
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function Slider({
@@ -712,6 +721,7 @@ export default function DailyLogForm() {
                   type="number"
                   className="med-dose-input"
                   min={0}
+                  step={MED_STEPS[med.medication]}
                   value={med.dosage}
                   onChange={(e) => updateMed(idx, 'dosage', Number(e.target.value))}
                 />
