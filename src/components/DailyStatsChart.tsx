@@ -4,7 +4,16 @@ import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, L
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type MetricKey = 'wakeTime' | 'socialTime' | 'workStart' | 'bedTime' | 'sleepHours' | 'cardio' | 'strength' | 'mood';
+type MetricKey =
+  | 'wakeTime'
+  | 'socialTime'
+  | 'workStart'
+  | 'bedTime'
+  | 'sleepHours'
+  | 'cardio'
+  | 'strength'
+  | 'mood'
+  | 'klonopinDose';
 
 interface DailyRecord {
   date: string;
@@ -16,6 +25,7 @@ interface DailyRecord {
   cardio: string | number | null;
   strength: string | number | null;
   mood: string | number | null;
+  klonopinDose: string | number | null;
 }
 
 // ─── Config ───────────────────────────────────────────────────────────────────
@@ -31,6 +41,7 @@ const METRIC_CONFIGS: Record<MetricKey, { defaultVal: number; spread: number; in
   cardio: { defaultVal: 0, spread: 60 }, // 0 min, 60 min = +4 pts
   strength: { defaultVal: 0, spread: 60 },
   mood: { defaultVal: 5, spread: 4 }, // already 1–10; maps linearly
+  klonopinDose: { defaultVal: 0, spread: 2 }, // 0mg=5, 0.5mg=6, 1mg=7, etc.
 };
 
 const METRIC_COLORS: Record<MetricKey, string> = {
@@ -42,6 +53,7 @@ const METRIC_COLORS: Record<MetricKey, string> = {
   cardio: '#6dbf8a',
   strength: '#5aab77',
   mood: '#c47eb5',
+  klonopinDose: '#e07a5f',
 };
 
 const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }[] }[] = [
@@ -61,6 +73,7 @@ const METRIC_GROUPS: { label: string; metrics: { key: MetricKey; label: string }
       { key: 'sleepHours', label: 'Sleep Hours' },
       { key: 'cardio', label: 'Cardio' },
       { key: 'strength', label: 'Strength' },
+      { key: 'klonopinDose', label: 'Klonopin' },
     ],
   },
 ];
@@ -127,6 +140,9 @@ function buildChartData(
           break;
         case 'mood':
           raw = r.mood !== null ? Number(r.mood) : null;
+          break;
+        case 'klonopinDose':
+          raw = r.klonopinDose !== null ? Number(r.klonopinDose) : null;
           break;
       }
       const cfg = METRIC_CONFIGS[m];
