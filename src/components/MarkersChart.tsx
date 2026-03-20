@@ -460,6 +460,11 @@ export default function MarkersChart() {
                     tick={{ fontSize: 10 }}
                     tickLine={false}
                     axisLine={{ stroke: 'rgba(232,228,223,0.1)' }}
+                    tickFormatter={(d: string) => {
+                      const date = new Date(d + 'T00:00:00');
+                      const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+                      return `${day} ${d.slice(5)}`;
+                    }}
                   />
                   <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={28} />
                   <Tooltip

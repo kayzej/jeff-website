@@ -163,7 +163,7 @@ function buildChartData(
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function DailyStatsChart() {
-  const [startDate, setStartDate] = useState(daysAgoStr(30));
+  const [startDate, setStartDate] = useState(daysAgoStr(7));
   const [endDate, setEndDate] = useState(todayStr());
   const [selectedMetrics, setSelectedMetrics] = useState<Set<MetricKey>>(new Set(['sleepHours', 'wakeTime']));
   const [records, setRecords] = useState<DailyRecord[]>([]);

@@ -723,7 +723,12 @@ export default function DailyLogForm() {
                   min={0}
                   step={MED_STEPS[med.medication]}
                   value={med.dosage}
-                  onChange={(e) => updateMed(idx, 'dosage', Number(e.target.value))}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    setMeds((m) =>
+                      m.map((e, i) => (i === idx ? { ...e, dosage: val, ...(val > 0 ? { taken: true } : {}) } : e))
+                    );
+                  }}
                 />
                 <span className="med-unit">{med.uom}</span>
               </div>
