@@ -154,6 +154,7 @@ export default function MarkersChart() {
   const [records, setRecords] = useState<MarkersRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [modalDate, setModalDate] = useState<string | null>(null);
 
   const fetchRecords = useCallback(async (start: string, end: string) => {
     setLoading(true);
@@ -176,6 +177,15 @@ export default function MarkersChart() {
   useEffect(() => {
     fetchRecords(startDate, endDate);
   }, [startDate, endDate, fetchRecords]);
+
+  const reflectionsByDate: Record<string, Record<string, string>> = {};
+  for (const r of records) {
+    const text = r.thoughtsFeelingsReflections as string | null;
+    if (text && String(text).trim()) {
+      if (!reflectionsByDate[r.date]) reflectionsByDate[r.date] = {};
+      reflectionsByDate[r.date][r.period] = String(text);
+    }
+  }
 
   const activeMetrics = Array.from(selectedMetrics);
   const chartData = buildChartData(records, activeMetrics);
@@ -355,6 +365,46 @@ export default function MarkersChart() {
           width: 18px; height: 2px; border-radius: 1px; flex-shrink: 0;
         }
 
+        /* Modal */
+        .modal-overlay {
+          position: fixed; inset: 0; z-index: 100;
+          background: rgba(0,0,0,0.65); display: flex;
+          align-items: center; justify-content: center; padding: 1.5rem;
+        }
+        .modal-box {
+          background: #181614; border: 1px solid rgba(232,228,223,0.12);
+          border-radius: 8px; padding: 1.75rem; max-width: 520px; width: 100%;
+          max-height: 80vh; overflow-y: auto;
+        }
+        .modal-header {
+          display: flex; align-items: baseline;
+          justify-content: space-between; margin-bottom: 1.25rem;
+        }
+        .modal-date {
+          font-family: 'DM Serif Display', serif; font-size: 1.1rem;
+          font-weight: 400; color: #fff; letter-spacing: -0.01em;
+        }
+        .modal-close {
+          background: transparent; border: none; color: rgba(232,228,223,0.4);
+          font-size: 1.3rem; cursor: pointer; line-height: 1; padding: 0;
+          transition: color 0.15s;
+        }
+        .modal-close:hover { color: rgba(232,228,223,0.8); }
+        .modal-period-block { margin-bottom: 1.1rem; }
+        .modal-period-block:last-child { margin-bottom: 0; }
+        .modal-period-label {
+          font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
+          color: rgba(212,168,83,0.6); margin-bottom: 0.4rem;
+        }
+        .modal-reflection-text {
+          font-size: 0.78rem; line-height: 1.7; color: rgba(232,228,223,0.75);
+          white-space: pre-wrap;
+        }
+        .modal-empty {
+          font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+          color: rgba(232,228,223,0.2); text-align: center; padding: 1rem 0;
+        }
+
         /* Recharts overrides */
         .recharts-cartesian-grid-horizontal line,
         .recharts-cartesian-grid-vertical line {
@@ -487,7 +537,19 @@ export default function MarkersChart() {
                       name={labelOf(key)}
                       stroke={METRIC_COLORS[key]}
                       strokeWidth={2}
-                      dot={{ fill: METRIC_COLORS[key], r: 3, strokeWidth: 0 }}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      dot={(props: any) => (
+                        <circle
+                          key={`dot-${key}-${props.payload.date}`}
+                          cx={props.cx}
+                          cy={props.cy}
+                          r={key === 'mood' ? 4 : 3}
+                          fill={METRIC_COLORS[key]}
+                          strokeWidth={0}
+                          style={key === 'mood' ? { cursor: 'pointer' } : undefined}
+                          onClick={key === 'mood' ? () => setModalDate(props.payload.date) : undefined}
+                        />
+                      )}
                       activeDot={{ r: 5, fill: METRIC_COLORS[key] }}
                       connectNulls={false}
                       isAnimationActive={false}
@@ -510,6 +572,33 @@ export default function MarkersChart() {
           )}
         </div>
       </div>
+
+      {modalDate && (
+        <div className="modal-overlay" onClick={() => setModalDate(null)}>
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <span className="modal-date">{modalDate}</span>
+              <button className="modal-close" onClick={() => setModalDate(null)}>
+                ×
+              </button>
+            </div>
+            {(['morning', 'afternoon', 'evening', 'night'] as const).some((p) => reflectionsByDate[modalDate]?.[p]) ? (
+              (['morning', 'afternoon', 'evening', 'night'] as const).map((p) => {
+                const text = reflectionsByDate[modalDate]?.[p];
+                if (!text) return null;
+                return (
+                  <div key={p} className="modal-period-block">
+                    <div className="modal-period-label">{p}</div>
+                    <p className="modal-reflection-text">{text}</p>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="modal-empty">No reflections recorded</p>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

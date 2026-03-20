@@ -26,7 +26,8 @@ export async function GET(req: NextRequest) {
         heart_palpitations            AS "heartPalpitations",
         night_sweats                  AS "nightSweats",
         wife, kids, family, friends, neighbors,
-        co_workers                    AS "coWorkers"
+        co_workers                    AS "coWorkers",
+        thoughts_feelings_reflections AS "thoughtsFeelingsReflections"
       FROM health.period_log WHERE date >= $1 AND date <= $2
       ORDER BY date, period`,
       [start, end]
