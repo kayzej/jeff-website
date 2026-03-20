@@ -502,7 +502,22 @@ export default function MarkersChart() {
           ) : (
             <>
               <ResponsiveContainer width="100%" height={320}>
-                <LineChart data={chartData} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 8, right: 16, bottom: 8, left: 0 }}
+                  onClick={
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    (data: any) => {
+                      if (!selectedMetrics.has('mood') || !data?.activePayload) return;
+                      const moodEntry = (data.activePayload as { dataKey: string; value: number | null }[]).find(
+                        (p) => p.dataKey === 'mood'
+                      );
+                      if (moodEntry?.value !== null && moodEntry?.value !== undefined)
+                        setModalDate(data.activeLabel as string);
+                    }
+                  }
+                  style={selectedMetrics.has('mood') ? { cursor: 'pointer' } : undefined}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="date"
@@ -537,19 +552,7 @@ export default function MarkersChart() {
                       name={labelOf(key)}
                       stroke={METRIC_COLORS[key]}
                       strokeWidth={2}
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      dot={(props: any) => (
-                        <circle
-                          key={`dot-${key}-${props.payload.date}`}
-                          cx={props.cx}
-                          cy={props.cy}
-                          r={key === 'mood' ? 4 : 3}
-                          fill={METRIC_COLORS[key]}
-                          strokeWidth={0}
-                          style={key === 'mood' ? { cursor: 'pointer' } : undefined}
-                          onClick={key === 'mood' ? () => setModalDate(props.payload.date) : undefined}
-                        />
-                      )}
+                      dot={{ fill: METRIC_COLORS[key], r: key === 'mood' ? 4 : 3, strokeWidth: 0 }}
                       activeDot={{ r: 5, fill: METRIC_COLORS[key] }}
                       connectNulls={false}
                       isAnimationActive={false}
