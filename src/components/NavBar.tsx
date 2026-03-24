@@ -15,14 +15,20 @@ const Navbar = () => {
     link.click();
   };
 
+  const isHome = pathname === '/';
+
   const buttons = [
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
-    { label: 'Daily Log', href: '/dailyLog' },
-    { label: 'Daily Stats', href: '/dailyStats' },
-    { label: 'Markers Graph', href: '/markersGraph' },
-    { label: 'Markers Detail', href: '/markersDetail' },
-    { label: 'Resume', onClick: handleResumeDownload }, // Use onClick for the Resume button
+    ...(!isHome
+      ? [
+          { label: 'Daily Log', href: '/dailyLog' },
+          { label: 'Daily Stats', href: '/dailyStats' },
+          { label: 'Markers Graph', href: '/markersGraph' },
+          { label: 'Markers Detail', href: '/markersDetail' },
+        ]
+      : []),
+    { label: 'Resume', onClick: handleResumeDownload },
   ];
 
   return (
