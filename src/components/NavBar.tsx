@@ -9,10 +9,10 @@ const Navbar = () => {
 
   const handleResumeDownload = (event: { preventDefault: () => void }) => {
     event.preventDefault();
-    const link = document.createElement('a');
-    link.href = '/Jeff_Kayzerman_Resume.pdf';
-    link.download = 'Jeff_Kayzerman_Resume.pdf';
-    link.click();
+    window.open(
+      'https://www.dropbox.com/scl/fi/3jttls4kaxjxj252jrwco/Jeff-Kayzerman-Resume-2026.pdf?rlkey=0ohvfydmp8zpbh1xxcxuqnha4&st=f2g5jsf4&dl=0',
+      '_blank'
+    );
   };
 
   const isHome = pathname === '/';
