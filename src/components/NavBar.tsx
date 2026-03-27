@@ -26,6 +26,7 @@ const Navbar = () => {
           { label: 'Daily Stats', href: '/dailyStats' },
           { label: 'Markers Graph', href: '/markersGraph' },
           { label: 'Markers Detail', href: '/markersDetail' },
+          { label: 'Journal', href: '/journal' },
         ]
       : []),
     { label: 'Resume', onClick: handleResumeDownload },
