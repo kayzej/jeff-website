@@ -46,14 +46,14 @@ Three routes, all GET (fetch by `?date=`) + POST (upsert):
 - `/api/period` — Period log (mood, symptoms) — up to 4 entries/day keyed by period
 - `/api/medications` — Medication log — batch upsert per period
 
-All routes use a module-level `pg.Pool` with `TIMESCALE_DATABASE_URL` and `ssl: { rejectUnauthorized: false }`. The medications POST uses a transaction via `pool.connect()` / `pgClient.release()`.
+All routes use a module-level `pg.Pool` with `DATABASE_URL` and `ssl: { rejectUnauthorized: false }`. The medications POST uses a transaction via `pool.connect()` / `pgClient.release()`.
 
 ### Database
 
 TimescaleDB (Tiger Cloud) with schema `health`. Three tables:
 
 - `health.daily_log` — one row per date
-- `health.period_log` — hypertable, up to 4 rows/day (period enum: morning/afternoon/evening/night)
+- `health.period_log` — up to 4 rows/day (period enum: morning/afternoon/evening/night)
 - `health.medication_log` — one row per medication per period per date
 
 Schema is in `setup.sql`. Column naming is snake_case in DB, camelCase in API responses (mapped via SQL aliases).
@@ -71,6 +71,6 @@ Large client component (~750 lines). Three independent sections — Daily, Perio
 Requires `.env.local` with:
 
 ```
-TIMESCALE_DATABASE_URL=postgres://user:password@host:port/tsdb?sslmode=require
+DATABASE_URL=postgres://user:password@host/dbname?sslmode=require
 NODE_TLS_REJECT_UNAUTHORIZED=0
 ```

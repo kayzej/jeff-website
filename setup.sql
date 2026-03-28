@@ -1,6 +1,6 @@
 -- ============================================================
 -- Health schema setup
--- Run once in your Tiger Cloud SQL editor
+-- Run once in your Neon SQL editor
 -- ============================================================
 
 CREATE SCHEMA IF NOT EXISTS health;
