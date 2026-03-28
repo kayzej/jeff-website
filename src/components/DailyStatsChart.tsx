@@ -165,7 +165,7 @@ function buildChartData(
 export default function DailyStatsChart() {
   const [startDate, setStartDate] = useState(daysAgoStr(7));
   const [endDate, setEndDate] = useState(todayStr());
-  const [selectedMetrics, setSelectedMetrics] = useState<Set<MetricKey>>(new Set(['sleepHours', 'wakeTime']));
+  const [selectedMetrics, setSelectedMetrics] = useState<Set<MetricKey>>(new Set(['mood']));
   const [records, setRecords] = useState<DailyRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
