@@ -16,7 +16,8 @@ CREATE TYPE health.medication_enum AS ENUM (
   'lithium',
   'divalproex',
   'lamotrigine',
-  'clonazepam'
+  'clonazepam',
+  'wegovy'
 );
 
 -- ============================================================
