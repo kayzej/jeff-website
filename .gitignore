@@ -36,3 +36,10 @@ yarn-error.log*
 next-env.d.ts
 
 .vscode
+
+# mobile (Expo)
+mobile/node_modules
+mobile/.expo
+mobile/dist
+mobile/android
+mobile/ios
