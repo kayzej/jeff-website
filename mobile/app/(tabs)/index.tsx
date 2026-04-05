@@ -45,6 +45,7 @@ export default function DailyScreen() {
   const [date, setDate] = useState(TODAY);
   const [log, setLog] = useState<DailyLog>(emptyLog(TODAY));
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle');
 
@@ -54,11 +55,13 @@ export default function DailyScreen() {
 
   async function load(d: string) {
     setLoading(true);
+    setLoadError(null);
     setStatus('idle');
     try {
       const record = await fetchDaily(d);
       setLog(record ?? emptyLog(d));
-    } catch {
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : String(e));
       setLog(emptyLog(d));
     } finally {
       setLoading(false);
@@ -101,6 +104,9 @@ export default function DailyScreen() {
             </Pressable>
           </View>
 
+          {loadError && (
+            <Text style={s.statusErr}>Load error: {loadError}</Text>
+          )}
           {loading ? (
             <ActivityIndicator color="#a78bfa" style={{ marginTop: 40 }} />
           ) : (

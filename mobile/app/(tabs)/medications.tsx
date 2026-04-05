@@ -49,6 +49,7 @@ export default function MedicationsScreen() {
   const [date, setDate] = useState(TODAY);
   const [meds, setMeds] = useState<MedicationRecord[]>(DEFAULT_MEDICATIONS.map((m) => ({ ...m })));
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle');
 
@@ -58,11 +59,13 @@ export default function MedicationsScreen() {
 
   async function load(d: string) {
     setLoading(true);
+    setLoadError(null);
     setStatus('idle');
     try {
       const fetched = await fetchMedications(d);
       setMeds(mergeWithDefaults(fetched));
-    } catch {
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : String(e));
       setMeds(DEFAULT_MEDICATIONS.map((m) => ({ ...m })));
     } finally {
       setLoading(false);
@@ -133,6 +136,9 @@ export default function MedicationsScreen() {
           </View>
         </View>
 
+        {loadError && (
+          <Text style={s.statusErr}>Load error: {loadError}</Text>
+        )}
         {loading ? (
           <ActivityIndicator color="#a78bfa" style={{ marginTop: 40 }} />
         ) : (

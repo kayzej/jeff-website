@@ -60,6 +60,7 @@ export default function MarkersScreen() {
   const [period, setPeriod] = useState<Period>('morning');
   const [records, setRecords] = useState<Partial<Record<Period, MarkerRecord>>>({});
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<'idle' | 'saved' | 'error'>('idle');
 
@@ -69,13 +70,15 @@ export default function MarkersScreen() {
 
   async function load(d: string) {
     setLoading(true);
+    setLoadError(null);
     setStatus('idle');
     try {
       const fetched = await fetchMarkers(d);
       const map: Partial<Record<Period, MarkerRecord>> = {};
       for (const r of fetched) map[r.period] = r;
       setRecords(map);
-    } catch {
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : String(e));
       setRecords({});
     } finally {
       setLoading(false);
@@ -139,6 +142,9 @@ export default function MarkersScreen() {
             ))}
           </View>
 
+          {loadError && (
+            <Text style={s.statusErr}>Load error: {loadError}</Text>
+          )}
           {loading ? (
             <ActivityIndicator color="#a78bfa" style={{ marginTop: 40 }} />
           ) : (
