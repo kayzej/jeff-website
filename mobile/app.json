@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.jeffkayzerman.health"
+      "bundleIdentifier": "com.jeffkayzerman.health",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -33,6 +36,13 @@
     "plugins": [
       "expo-router",
       "expo-web-browser"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2aec3eef-ef26-449b-958a-6fd00dae003d"
+      }
+    },
+    "owner": "jkayzerman"
   }
 }
