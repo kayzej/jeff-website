@@ -104,3 +104,16 @@ CREATE TABLE IF NOT EXISTS health.medication_log (
 
 CREATE INDEX IF NOT EXISTS idx_medication_log_medication_date
   ON health.medication_log (medication, date);
+
+-- ============================================================
+-- AI Insights
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS health.insights (
+  id          SERIAL PRIMARY KEY,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  start_date  DATE        NOT NULL,
+  end_date    DATE        NOT NULL,
+  model       TEXT        NOT NULL,
+  text        TEXT        NOT NULL
+);
