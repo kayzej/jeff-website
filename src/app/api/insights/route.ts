@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -70,32 +70,20 @@ export async function GET(req: NextRequest) {
 
     const prompt = buildPrompt(start, end, dailyRes.rows, markersRes.rows, medsRes.rows);
 
-    // ── Stream Claude response ────────────────────────────────────────────────
+    // ── Call Claude ───────────────────────────────────────────────────────────
 
-    const stream = client.messages.stream({
+    const message = await client.messages.create({
       model: 'claude-opus-4-6',
       max_tokens: 2048,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const readable = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-        try {
-          for await (const chunk of stream) {
-            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-              controller.enqueue(encoder.encode(chunk.delta.text));
-            }
-          }
-        } finally {
-          controller.close();
-        }
-      },
-    });
+    const text = message.content
+      .filter((block) => block.type === 'text')
+      .map((block) => (block.type === 'text' ? block.text : ''))
+      .join('');
 
-    return new Response(readable, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    });
+    return NextResponse.json({ text });
   } catch (error) {
     return new Response(JSON.stringify({ message: error instanceof Error ? error.message : 'Server error' }), {
       status: 500,

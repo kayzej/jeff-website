@@ -35,22 +35,9 @@ export default function InsightsPage() {
         signal: controller.signal,
       });
 
-      if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.message ?? 'Request failed');
-      }
-
-      const reader = res.body!.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
-
-      while (!done) {
-        const result = await reader.read();
-        done = result.done;
-        if (result.value) {
-          setOutput((prev) => prev + decoder.decode(result.value, { stream: true }));
-        }
-      }
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message ?? 'Request failed');
+      setOutput(json.text ?? '');
     } catch (e) {
       if ((e as Error).name !== 'AbortError') {
         setError(e instanceof Error ? e.message : 'Something went wrong');
@@ -208,15 +195,9 @@ export default function InsightsPage() {
           {error ? (
             <span className="error">{error}</span>
           ) : output ? (
-            <>
-              <FormattedOutput text={output} />
-              {loading && <span className="cursor" />}
-            </>
+            <FormattedOutput text={output} />
           ) : loading ? (
-            <>
-              <span className="placeholder">Analyzing your data</span>
-              <span className="cursor" />
-            </>
+            <span className="placeholder">Analyzing your data…</span>
           ) : (
             <span className="placeholder">Select a date range and click Generate Insights.</span>
           )}
