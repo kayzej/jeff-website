@@ -180,11 +180,24 @@ export default function InsightsPage() {
         <div className="controls">
           <div className="field">
             <label>From</label>
-            <input type="date" value={start} max={end} onChange={(e) => setStart(e.target.value)} />
+            <input
+              type="date"
+              value={start}
+              max={end}
+              onChange={(e) => setStart(e.target.value)}
+              suppressHydrationWarning
+            />
           </div>
           <div className="field">
             <label>To</label>
-            <input type="date" value={end} min={start} max={today} onChange={(e) => setEnd(e.target.value)} />
+            <input
+              type="date"
+              value={end}
+              min={start}
+              max={today}
+              onChange={(e) => setEnd(e.target.value)}
+              suppressHydrationWarning
+            />
           </div>
           <button className={`generate-btn${loading ? ' loading' : ''}`} onClick={generate}>
             {loading ? 'Stop' : 'Generate Insights'}

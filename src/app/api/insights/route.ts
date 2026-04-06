@@ -16,11 +16,12 @@ export async function GET(req: NextRequest) {
     return new Response(JSON.stringify({ message: 'start and end required' }), { status: 400 });
   }
 
-  // ── Fetch all data for the range ──────────────────────────────────────────
+  try {
+    // ── Fetch all data for the range ──────────────────────────────────────────
 
-  const [dailyRes, markersRes, medsRes] = await Promise.all([
-    pool.query(
-      `SELECT
+    const [dailyRes, markersRes, medsRes] = await Promise.all([
+      pool.query(
+        `SELECT
         date::text,
         time_of_waking_up::text            AS "timeOfWakingUp",
         first_social_interaction::text     AS "firstSocialInteraction",
@@ -32,10 +33,10 @@ export async function GET(req: NextRequest) {
       FROM health.daily_log
       WHERE date >= $1 AND date <= $2
       ORDER BY date`,
-      [start, end]
-    ),
-    pool.query(
-      `SELECT
+        [start, end]
+      ),
+      pool.query(
+        `SELECT
         date::text,
         period,
         mood,
@@ -54,47 +55,53 @@ export async function GET(req: NextRequest) {
       FROM health.period_log
       WHERE date >= $1 AND date <= $2
       ORDER BY date, period`,
-      [start, end]
-    ),
-    pool.query(
-      `SELECT date::text, medication, dosage, uom, taken
+        [start, end]
+      ),
+      pool.query(
+        `SELECT date::text, medication, dosage, uom, taken
        FROM health.medication_log
        WHERE date >= $1 AND date <= $2
        ORDER BY date, medication`,
-      [start, end]
-    ),
-  ]);
+        [start, end]
+      ),
+    ]);
 
-  // ── Build prompt ──────────────────────────────────────────────────────────
+    // ── Build prompt ──────────────────────────────────────────────────────────
 
-  const prompt = buildPrompt(start, end, dailyRes.rows, markersRes.rows, medsRes.rows);
+    const prompt = buildPrompt(start, end, dailyRes.rows, markersRes.rows, medsRes.rows);
 
-  // ── Stream Claude response ────────────────────────────────────────────────
+    // ── Stream Claude response ────────────────────────────────────────────────
 
-  const stream = client.messages.stream({
-    model: 'claude-opus-4-6',
-    max_tokens: 2048,
-    messages: [{ role: 'user', content: prompt }],
-  });
+    const stream = client.messages.stream({
+      model: 'claude-opus-4-6',
+      max_tokens: 2048,
+      messages: [{ role: 'user', content: prompt }],
+    });
 
-  const readable = new ReadableStream({
-    async start(controller) {
-      const encoder = new TextEncoder();
-      try {
-        for await (const chunk of await stream) {
-          if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-            controller.enqueue(encoder.encode(chunk.delta.text));
+    const readable = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        try {
+          for await (const chunk of stream) {
+            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+              controller.enqueue(encoder.encode(chunk.delta.text));
+            }
           }
+        } finally {
+          controller.close();
         }
-      } finally {
-        controller.close();
-      }
-    },
-  });
+      },
+    });
 
-  return new Response(readable, {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  });
+    return new Response(readable, {
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  } catch (error) {
+    return new Response(JSON.stringify({ message: error instanceof Error ? error.message : 'Server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
 }
 
 // ── Prompt builder ────────────────────────────────────────────────────────
