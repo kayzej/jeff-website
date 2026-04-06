@@ -9,8 +9,8 @@ const pool = new Pool({
 export async function GET() {
   try {
     const { rows } = await pool.query(
-      `SELECT id, created_at AS "createdAt", start_date AS "startDate",
-              end_date AS "endDate", model, text
+      `SELECT id, created_at AS "createdAt", start_date::text AS "startDate",
+              end_date::text AS "endDate", model, text
        FROM health.insights
        ORDER BY created_at DESC
        LIMIT 20`
