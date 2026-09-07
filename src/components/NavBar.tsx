@@ -24,13 +24,13 @@ const Navbar = () => {
     { label: 'Quick Facts', href: '/quickFacts' },
     ...(!isHome
       ? [
-        // { label: 'Daily Log', href: '/dailyLog' },
-        // { label: 'Daily Stats', href: '/dailyStats' },
-        // { label: 'Markers Graph', href: '/markersGraph' },
-        // { label: 'Markers Detail', href: '/markersDetail' },
-        // { label: 'Journal', href: '/journal' },
-        // { label: 'Insights', href: '/insights' },
-      ]
+          // { label: 'Daily Log', href: '/dailyLog' },
+          // { label: 'Daily Stats', href: '/dailyStats' },
+          // { label: 'Markers Graph', href: '/markersGraph' },
+          // { label: 'Markers Detail', href: '/markersDetail' },
+          // { label: 'Journal', href: '/journal' },
+          // { label: 'Insights', href: '/insights' },
+        ]
       : []),
     { label: 'Resume', onClick: handleResumeDownload },
   ];
