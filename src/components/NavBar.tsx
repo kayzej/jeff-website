@@ -5,7 +5,16 @@ import { AppBar, Toolbar, Button, Box } from '@mui/material';
 
 const Navbar = () => {
   const pathname = usePathname();
+<<<<<<< Updated upstream
   const isTransparent = pathname === '/' || pathname === '/about';
+=======
+  const isTransparent =
+    pathname === '/' ||
+    pathname === '/hobbies' ||
+    pathname === '/quickFacts' ||
+    pathname === '/3dPrints' ||
+    pathname === '/aboutSite';
+>>>>>>> Stashed changes
 
   const handleResumeDownload = (event: { preventDefault: () => void }) => {
     event.preventDefault();
@@ -19,7 +28,14 @@ const Navbar = () => {
 
   const buttons = [
     { label: 'Home', href: '/' },
+<<<<<<< Updated upstream
     { label: 'About', href: '/about' },
+=======
+    { label: 'Hobbies', href: '/hobbies' },
+    { label: 'Quick Facts', href: '/quickFacts' },
+    { label: '3D Prints', href: '/3dPrints' },
+    { label: 'About This Site', href: '/aboutSite' },
+>>>>>>> Stashed changes
     ...(!isHome
       ? [
           { label: 'Daily Log', href: '/dailyLog' },
