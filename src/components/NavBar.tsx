@@ -5,21 +5,18 @@ import { AppBar, Toolbar, Button, Box } from '@mui/material';
 
 const Navbar = () => {
   const pathname = usePathname();
-<<<<<<< Updated upstream
-  const isTransparent = pathname === '/' || pathname === '/about';
-=======
   const isTransparent =
     pathname === '/' ||
     pathname === '/hobbies' ||
     pathname === '/quickFacts' ||
     pathname === '/3dPrints' ||
     pathname === '/aboutSite';
->>>>>>> Stashed changes
 
   const handleResumeDownload = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     window.open(
-      'https://www.dropbox.com/scl/fi/3jttls4kaxjxj252jrwco/Jeff-Kayzerman-Resume-2026.pdf?rlkey=0ohvfydmp8zpbh1xxcxuqnha4&st=f2g5jsf4&dl=0',
+      'Jeff Kayzerman Resume.pdf',
+      // 'https://www.dropbox.com/scl/fi/m7z0yiap5q9l11piwsy2b/Jeff-Kayzerman-Resume.pdf?rlkey=r4llvg5kcbzbrrfupva0p3b5o&st=ec0f7cs4&dl=0',
       '_blank'
     );
   };
@@ -28,22 +25,18 @@ const Navbar = () => {
 
   const buttons = [
     { label: 'Home', href: '/' },
-<<<<<<< Updated upstream
-    { label: 'About', href: '/about' },
-=======
     { label: 'Hobbies', href: '/hobbies' },
     { label: 'Quick Facts', href: '/quickFacts' },
     { label: '3D Prints', href: '/3dPrints' },
     { label: 'About This Site', href: '/aboutSite' },
->>>>>>> Stashed changes
     ...(!isHome
       ? [
-          { label: 'Daily Log', href: '/dailyLog' },
-          { label: 'Daily Stats', href: '/dailyStats' },
-          { label: 'Markers Graph', href: '/markersGraph' },
-          { label: 'Markers Detail', href: '/markersDetail' },
-          { label: 'Journal', href: '/journal' },
-          { label: 'Insights', href: '/insights' },
+          // { label: 'Daily Log', href: '/dailyLog' },
+          // { label: 'Daily Stats', href: '/dailyStats' },
+          // { label: 'Markers Graph', href: '/markersGraph' },
+          // { label: 'Markers Detail', href: '/markersDetail' },
+          // { label: 'Journal', href: '/journal' },
+          // { label: 'Insights', href: '/insights' },
         ]
       : []),
     { label: 'Resume', onClick: handleResumeDownload },
