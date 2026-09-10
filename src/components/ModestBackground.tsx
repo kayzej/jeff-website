@@ -9,13 +9,14 @@ export default function ModestBackground() {
         <div className="max-w-xl text-center md:text-left">
           <h1 className="font-serif text-4xl font-bold text-white md:text-5xl">Jeffrey Kayzerman</h1>
           <p className="mt-4 font-mono text-base text-slate-300 md:text-lg">
-            Hi there! I&apos;m a Software Architect and engineer who enjoys building things and solving complex
-            problems. I have a passion for learning and sharing knowledge, and I love to explore new technologies and
-            ideas. Welcome to my personal website!
+            Hi, I&apos;m Jeff. Software architect, engineer and AI specialist. I design systems that hold up in the real
+            world. I&apos;ve built software across very different worlds: large banks, a B2B SaaS startup, a B2C
+            Consumer platform, and systems architecture for a defense manufacturer. Lately I&apos;ve been focused on
+            agentic AI, and specifically how to architect multi-model systems that are fast, cost-aware, and reliable
+            enough for production. This is where I share what I&apos;m building, what I&apos;m learning and a little bit
+            of my personal life and thoughts.
           </p>
-          <h2 className="mt-8 font-serif text-2xl font-bold text-white md:text-3xl">
-            I love meeting new people, feel free to get in touch!
-          </h2>
+          <h2 className="mt-8 font-serif text-2xl font-bold text-white md:text-3xl">I&apos;d love to connect!</h2>
           <ul className="mt-3 list-disc space-y-1 pl-5 text-left font-mono text-base text-slate-300 md:text-lg">
             <li>
               LinkedIn:{' '}
@@ -27,12 +28,11 @@ export default function ModestBackground() {
           </ul>
           <p className="mt-8 font-mono text-base text-slate-300 md:text-lg">
             While you&apos;re here, check out my{' '}
-            <a href="/hobbies" className="text-blue-400 hover:text-blue-300">
-              Hobbies
-            </a>{' '}
-            and{' '}
             <a href="/quickFacts" className="text-blue-400 hover:text-blue-300">
               Quick Facts
+            </a>{' '}
+            <a href="/hobbies" className="text-blue-400 hover:text-blue-300">
+              Hobbies
             </a>{' '}
           </p>
         </div>
